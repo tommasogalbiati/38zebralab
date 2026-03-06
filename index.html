@@ -177,13 +177,17 @@
     .divider { margin: 0 28px; }
 
     .hero-zebra-img {
-      height: auto; width: 100%; max-width: 100%;
-      left: 0; transform: none;
-      object-fit: cover;
+      height: 60%;
+      width: auto;
+      max-width: none;
+      left: 50%;
+      transform: translateX(-50%);
+      object-fit: contain;
+      object-position: bottom center;
     }
-    .hero-text { top: 80px; left: 0; transform: none; padding: 0 28px; }
-    .hero-tagline { font-size: clamp(30px, 9vw, 52px); white-space: normal; word-break: break-word; line-height: 1.05; }
-    .hero-sub { font-size: 9px; letter-spacing: 0.18em; margin-top: 12px; }
+    .hero-text { top: 72px; left: 0; transform: none; padding: 0 24px; }
+    .hero-tagline { font-size: clamp(32px, 10vw, 54px); white-space: normal; word-break: break-word; line-height: 1.05; }
+    .hero-sub { font-size: 9px; letter-spacing: 0.18em; margin-top: 10px; }
     .hero-bottom { left: 28px; bottom: 28px; }
 
     .cap-item { grid-template-columns: 1fr; }
