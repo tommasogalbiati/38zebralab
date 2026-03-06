@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>38ZebraLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@100;200&family=Inter:wght@100;200;300;400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #fdfcfa;
+    --black: #080808;
+    --gray: #6a6a64;
+    --line: rgba(8,8,8,0.08);
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --yellow: #e6b800;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--black); font-family: var(--font); font-size: 16px; line-height: 1.6; overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 28px 60px;
+    background: transparent;
+  }
+  .logo { font-size: 14px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--black); }
+  .logo span { color: var(--yellow); }
+  .nav-cta { font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); text-decoration: none; border: 1px solid rgba(8,8,8,0.25); padding: 10px 22px; transition: all 0.3s ease; }
+  .nav-cta:hover { border-color: var(--yellow); color: var(--yellow); }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-zebra-img {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 72%;
+    width: auto;
+    object-fit: contain;
+    object-position: bottom center;
+    z-index: 1;
+    filter: none;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(245,245,240,0.45) 0%, rgba(245,245,240,0.05) 40%, rgba(245,245,240,0.0) 70%, rgba(245,245,240,0.55) 100%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .hero-text {
+    position: absolute;
+    top: 88px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    padding: 0 40px;
+  }
+
+  .hero-tagline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 6vw, 100px);
+    font-weight: 100;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--black);
+    line-height: 1.0;
+    white-space: nowrap;
+    -webkit-text-stroke: 0px;
+    color: var(--black);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 100;
+  }
+  .hero-tagline .dot { color: var(--yellow); -webkit-text-stroke: 0px; }
+
+  .hero-sub {
+    margin-top: 16px;
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(8,8,8,0.4);
+    font-weight: 300;
+  }
+
+  .hero-bottom {
+    position: absolute;
+    bottom: 40px;
+    left: 60px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .hero-bottom-line { width: 40px; height: 1px; background: var(--yellow); }
+  .hero-bottom-text { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--black); }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--line); margin: 0 60px; }
+
+  /* CAPABILITIES */
+  .capabilities { padding: 0; }
+  .cap-item { display: grid; grid-template-columns: 1fr 1px 1fr; min-height: 280px; border-bottom: 1px solid var(--line); }
+  .cap-item:last-child { border-bottom: none; }
+  .cap-left { padding: 70px 60px; display: flex; flex-direction: column; justify-content: center; }
+  .cap-num { font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gray); margin-bottom: 28px; font-weight: 500; }
+  .cap-headline { font-size: clamp(28px, 3.5vw, 48px); font-weight: 300; line-height: 1.15; letter-spacing: -0.02em; color: var(--black); }
+  .cap-headline strong { font-weight: 400; color: var(--black); display: block; }
+  .cap-headline em { font-style: italic; color: var(--gray); font-family: Georgia, 'Times New Roman', serif; display: block; }
+  .cap-divider { background: var(--line); width: 1px; }
+  .cap-right { padding: 70px 60px; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+  .cap-tag { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(8,8,8,0.25); font-weight: 500; transition: color 0.3s ease; }
+  .cap-item:hover .cap-tag { color: var(--gray); }
+
+  /* PHILOSOPHY */
+  .philosophy { padding: 120px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; }
+  .phil-quote { font-size: clamp(22px, 2.8vw, 36px); font-weight: 300; line-height: 1.35; letter-spacing: -0.015em; color: var(--black); margin-bottom: 40px; }
+  .phil-quote strong { font-weight: 600; }
+  .phil-attr { font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); }
+  .phil-right { display: flex; flex-direction: column; gap: 40px; }
+  .phil-stat { border-left: 2px solid var(--yellow); padding-left: 28px; }
+  .phil-stat-num { font-size: 40px; font-weight: 300; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--black); }
+  .phil-stat-label { font-size: 12px; color: var(--gray); letter-spacing: 0.05em; }
+
+  /* LOCATIONS */
+  .locations { padding: 80px 60px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .loc-name { font-size: clamp(24px, 3.5vw, 52px); font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); white-space: nowrap; }
+  .loc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); margin: 0 32px; flex-shrink: 0; }
+
+  /* CONTACT */
+  .contact { padding: 120px 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 40vh; }
+  .contact-line { font-size: clamp(22px, 3.5vw, 48px); font-weight: 300; letter-spacing: -0.01em; line-height: 1.3; color: var(--black); margin-bottom: 48px; }
+  .contact-line em { font-style: italic; color: var(--gray); font-family: Georgia, serif; }
+  .btn-primary { font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--bg); background: var(--black); padding: 18px 48px; text-decoration: none; transition: background 0.3s ease; }
+  .btn-primary:hover { background: var(--yellow); color: var(--black); }
+
+  /* FOOTER */
+  footer { padding: 40px 60px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  .footer-logo { font-size: 13px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--black); }
+  .footer-logo span { color: var(--yellow); }
+  .footer-copy { font-size: 12px; color: var(--gray); letter-spacing: 0.05em; }
+
+  /* ANIMATIONS */
+  .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 22px 28px; }
+    .hero-text { padding: 100px 28px 0; }
+    .hero-tagline { font-size: clamp(28px, 8vw, 56px); white-space: normal; }
+    .hero-bottom { left: 28px; }
+    .divider { margin: 0 28px; }
+    .cap-item { grid-template-columns: 1fr; }
+    .cap-divider { display: none; }
+    .cap-left, .cap-right { padding: 48px 28px; }
+    .cap-right { padding-top: 0; }
+    .philosophy { grid-template-columns: 1fr; gap: 60px; padding: 80px 28px; }
+    .contact { padding: 80px 28px; }
+    .locations { padding: 60px 28px; }
+    .loc-dot { margin: 0 20px; }
+    footer { padding: 32px 28px; flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">38<span>Zebra</span>Lab</div>
+  <a href="#contact" class="nav-cta">Get in touch</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <img class="hero-zebra-img" src="https://i.postimg.cc/4dymBbVP/Untitled-(1).png" alt="Zebra">
+  <div class="hero-overlay"></div>
+  <div class="hero-text">
+    <div class="hero-tagline">NOW<span class="dot">.</span> BEFORE IT'S OBVIOUS<span class="dot">.</span></div>
+    <div class="hero-sub">Legal · Asset · Advisory · Compliance · Web</div>
+  </div>
+  <div class="hero-bottom">
+    <div class="hero-bottom-line"></div>
+    <div class="hero-bottom-text">Miami · New York · Milano</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CAPABILITIES -->
+<section class="capabilities" id="capabilities">
+  <div class="cap-item fade-in">
+    <div class="cap-left">
+      <div class="cap-num">Legal Intelligence</div>
+      <div class="cap-headline"><strong>The law is the same.</strong><em>The reading isn't.</em></div>
+    </div>
+    <div class="cap-divider"></div>
+    <div class="cap-right">
+      <div class="cap-tag">Regulation as competitive advantage</div>
+      <div class="cap-tag">Jurisdictional arbitrage</div>
+      <div class="cap-tag">Early-warning legal mapping</div>
+      <div class="cap-tag">We read the law before the memo lands</div>
+    </div>
+  </div>
+  <div class="cap-item fade-in">
+    <div class="cap-left">
+      <div class="cap-num">Asset Intelligence</div>
+      <div class="cap-headline"><strong>Raw data.</strong><em>We cook it.</em></div>
+    </div>
+    <div class="cap-divider"></div>
+    <div class="cap-right">
+      <div class="cap-tag">Real estate · Private equity · Alternative assets</div>
+      <div class="cap-tag">Market mapping before the price moves</div>
+      <div class="cap-tag">Intelligence that stays off the pitch deck</div>
+    </div>
+  </div>
+  <div class="cap-item fade-in">
+    <div class="cap-left">
+      <div class="cap-num">Strategic Advisory</div>
+      <div class="cap-headline"><strong>Numbers that survive</strong><em>the other room.</em></div>
+    </div>
+    <div class="cap-divider"></div>
+    <div class="cap-right">
+      <div class="cap-tag">Due diligence that holds under adversarial scrutiny</div>
+      <div class="cap-tag">Forecasts built to be attacked — and to survive</div>
+      <div class="cap-tag">No slide decks. No theater.</div>
+    </div>
+  </div>
+  <div class="cap-item fade-in">
+    <div class="cap-left">
+      <div class="cap-num">Emerging Compliance</div>
+      <div class="cap-headline"><strong>We write the checklist</strong><em>before the rule exists.</em></div>
+    </div>
+    <div class="cap-divider"></div>
+    <div class="cap-right">
+      <div class="cap-tag">AI · Crypto · Cross-border regulatory frameworks</div>
+      <div class="cap-tag">Ahead of enforcement, not behind it</div>
+      <div class="cap-tag">Compliance as a strategic position</div>
+    </div>
+  </div>
+  <div class="cap-item fade-in">
+    <div class="cap-left">
+      <div class="cap-num">Web Development</div>
+      <div class="cap-headline"><strong>Built to work.</strong><em>Designed to last.</em></div>
+    </div>
+    <div class="cap-divider"></div>
+    <div class="cap-right">
+      <div class="cap-tag">Product interfaces & client portals</div>
+      <div class="cap-tag">Precision engineering, not template assembly</div>
+      <div class="cap-tag">Infrastructure that scales with the decision</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy">
+  <div class="phil-left fade-in">
+    <p class="phil-quote">"The most valuable intelligence is the kind that <strong>changes the decision</strong> — not just confirms it."</p>
+    <div class="phil-attr">— 38ZebraLab</div>
+  </div>
+  <div class="phil-right">
+    <div class="phil-stat fade-in"><div class="phil-stat-num">5</div><div class="phil-stat-label">Integrated practice areas</div></div>
+    <div class="phil-stat fade-in"><div class="phil-stat-num">B2B + B2C</div><div class="phil-stat-label">Serving both institutional and individual clients</div></div>
+    <div class="phil-stat fade-in"><div class="phil-stat-num">01</div><div class="phil-stat-label">Principle: clarity over complexity</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- LOCATIONS -->
+<div class="locations fade-in">
+  <span class="loc-name">Miami</span>
+  <span class="loc-dot"></span>
+  <span class="loc-name">New York</span>
+  <span class="loc-dot"></span>
+  <span class="loc-name">Milano</span>
+</div>
+
+<div class="divider"></div>
+
+<!-- CONTACT -->
+<section class="contact fade-in" id="contact">
+  <div class="contact-line">
+    If you found us,<br><em>you were already looking.</em>
+  </div>
+  <a href="mailto:hello@38zebralab.com" class="btn-primary">Get in touch</a>
+</section>
+
+<footer>
+  <div class="footer-logo">38<span>Zebra</span>Lab</div>
+  <div class="footer-copy">© 2026 38ZebraLab. All rights reserved.</div>
+</footer>
+
+<script>
+  const els = document.querySelectorAll('.fade-in');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
