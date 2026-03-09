@@ -1,413 +1,652 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>38ZebraLab</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@100;200&family=Inter:wght@100;200;300;400;600&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --bg: #fdfcfa;
-    --black: #080808;
-    --gray: #6a6a64;
-    --line: rgba(8,8,8,0.08);
-    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --yellow: #e6b800;
-  }
-  html { scroll-behavior: smooth; }
-  body { background: var(--bg); color: var(--black); font-family: var(--font); font-size: 16px; line-height: 1.6; overflow-x: hidden; }
-
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 28px 60px;
-    background: transparent;
-  }
-  .logo { font-size: 14px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--black); }
-  .logo span { color: var(--yellow); }
-  .nav-cta { font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); text-decoration: none; border: 1px solid rgba(8,8,8,0.25); padding: 10px 22px; transition: all 0.3s ease; }
-  .nav-cta:hover { border-color: var(--yellow); color: var(--yellow); }
-
-  /* HERO */
-  .hero {
-    position: relative; width: 100%; min-height: 100svh;
-    overflow: hidden; background: var(--bg);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .hero-zebra-img {
-    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    height: 72%; width: auto; object-fit: contain; object-position: bottom center;
-    z-index: 1;
-  }
-  .hero-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to bottom, rgba(245,245,240,0.45) 0%, rgba(245,245,240,0.05) 40%, rgba(245,245,240,0.0) 70%, rgba(245,245,240,0.55) 100%);
-    z-index: 2; pointer-events: none;
-  }
-  .hero-text {
-    position: absolute; top: 88px; left: 50%; transform: translateX(-50%);
-    z-index: 3; display: flex; flex-direction: column; align-items: center;
-    text-align: center; width: 100%; padding: 0 40px;
-  }
-  .hero-tagline {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(36px, 6vw, 100px); font-weight: 100;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--black); line-height: 1.0; white-space: nowrap;
-  }
-  .hero-tagline .dot { color: var(--yellow); }
-  .hero-sub {
-    margin-top: 16px; font-size: 11px; letter-spacing: 0.28em;
-    text-transform: uppercase; color: rgba(8,8,8,0.4); font-weight: 300;
-  }
-  .hero-bottom {
-    position: absolute; bottom: 40px; left: 60px; z-index: 3;
-    display: flex; align-items: center; gap: 16px;
-  }
-  .hero-bottom-line { width: 40px; height: 1px; background: var(--yellow); }
-  .hero-bottom-text { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--black); }
-
-  /* DIVIDER */
-  .divider { height: 1px; background: var(--line); margin: 0 60px; }
-
-  /* CAPABILITIES */
-  .cap-item { display: grid; grid-template-columns: 1fr 1px 1fr; min-height: 280px; border-bottom: 1px solid var(--line); }
-  .cap-item:last-child { border-bottom: none; }
-  .cap-left { padding: 70px 60px; display: flex; flex-direction: column; justify-content: center; }
-  .cap-num { font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gray); margin-bottom: 28px; font-weight: 500; }
-  .cap-headline { font-size: clamp(28px, 3.5vw, 48px); font-weight: 300; line-height: 1.15; letter-spacing: -0.02em; }
-  .cap-headline strong { font-weight: 400; display: block; }
-  .cap-headline em { font-style: italic; color: var(--gray); font-family: Georgia, serif; display: block; }
-  .cap-divider { background: var(--line); width: 1px; }
-  .cap-right { padding: 70px 60px; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
-  .cap-tag { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(8,8,8,0.25); font-weight: 500; transition: color 0.3s ease; }
-  .cap-item:hover .cap-tag { color: var(--gray); }
-
-  /* PHILOSOPHY */
-  .philosophy { padding: 120px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; }
-  .phil-quote { font-size: clamp(22px, 2.8vw, 36px); font-weight: 300; line-height: 1.35; letter-spacing: -0.015em; margin-bottom: 40px; }
-  .phil-quote strong { font-weight: 600; }
-  .phil-attr { font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); }
-  .phil-right { display: flex; flex-direction: column; gap: 40px; }
-  .phil-stat { border-left: 2px solid var(--yellow); padding-left: 28px; }
-  .phil-stat-num { font-size: 40px; font-weight: 300; letter-spacing: -0.02em; margin-bottom: 6px; }
-  .phil-stat-label { font-size: 12px; color: var(--gray); letter-spacing: 0.05em; }
-
-  /* LOCATIONS */
-  .locations { padding: 80px 60px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }
-  .loc-name { font-size: clamp(24px, 3.5vw, 52px); font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; }
-  .loc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); margin: 0 32px; flex-shrink: 0; }
-
-  /* CONTACT */
-  .contact { padding: 120px 60px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-  .contact-line { font-size: clamp(22px, 3.5vw, 48px); font-weight: 300; letter-spacing: -0.01em; line-height: 1.3; margin-bottom: 64px; }
-  .contact-line em { font-style: italic; color: var(--gray); font-family: Georgia, serif; }
-
-  /* FORM */
-  .contact-form { width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 0; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-  .field { display: flex; flex-direction: column; }
-  .field input,
-  .field textarea {
-    width: 100%;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid var(--line);
-    border-right: 1px solid transparent;
-    padding: 20px 0;
-    font-family: var(--font);
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--black);
-    letter-spacing: 0.04em;
-    outline: none;
-    transition: border-color 0.3s ease;
-    resize: none;
-  }
-  .form-row .field:first-child input { border-right: 1px solid var(--line); padding-right: 24px; }
-  .form-row .field:last-child input { padding-left: 24px; }
-  .field input::placeholder,
-  .field textarea::placeholder {
-    color: rgba(8,8,8,0.3);
-    font-size: 10px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-  }
-  .field input:focus,
-  .field textarea:focus { border-bottom-color: var(--yellow); }
-  .field textarea { min-height: 120px; padding-top: 20px; }
-  .form-submit {
-    margin-top: 40px;
-    align-self: center;
-    font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--bg); background: var(--black);
-    border: none; padding: 18px 48px; cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  .form-submit:hover { background: var(--yellow); color: var(--black); }
-
-  /* THANK YOU STATE */
-  .thankyou {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    padding: 48px 0;
-  }
-  .thankyou-icon { width: 40px; height: 40px; border: 1.5px solid var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  .thankyou-icon svg { width: 18px; height: 18px; stroke: var(--yellow); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .thankyou-title { font-size: 22px; font-weight: 300; letter-spacing: -0.01em; }
-  .thankyou-sub { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gray); }
-
-  /* FOOTER */
-  footer { padding: 40px 60px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
-  .footer-logo { font-size: 13px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; }
-  .footer-logo span { color: var(--yellow); }
-  .footer-copy { font-size: 12px; color: var(--gray); letter-spacing: 0.05em; }
-
-  /* ANIMATIONS */
-  .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
-  .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-  /* ── MOBILE ── */
-  @media (max-width: 900px) {
-    nav { padding: 22px 28px; }
-    .divider { margin: 0 28px; }
-
-    .hero-zebra-img {
-      height: 45%;
-      width: auto;
-      max-width: none;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 80px;
-      object-fit: contain;
-      object-position: bottom center;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>38ZebraLab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Barlow+Condensed:wght@100;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cx: -40px; --cy: -40px;
+      --bg: #F7F6F3; --ink: #1A1A1A;
+      --noise-col: #C0BDB8; --muted: #9A9896; --accent: #FFD600;
+      --font-type: 'Special Elite', 'Courier New', monospace;
+      --font-cond: 'Barlow Condensed', sans-serif;
+      --sz-noise: clamp(1.01rem,1.43vw,1.235rem);
+      --sz-body:  clamp(1.05rem,1.5vw,1.2rem);
+      --sz-def:   clamp(1.1rem,1.6vw,1.28rem);
+      --sz-logo:  clamp(0.95rem,1.25vw,1.1rem);
+      --sz-micro: 0.75rem;
+      --sz-ask:   clamp(2rem,3.5vw,2.8rem);
+      --edge: 1.5rem;
+      --ease: cubic-bezier(0.16,1,0.3,1);
     }
-    .hero-text { top: 72px; left: 0; transform: none; padding: 0 24px; }
-    .hero-tagline { font-size: clamp(32px, 10vw, 54px); white-space: normal; word-break: break-word; line-height: 1.05; }
-    .hero-sub { font-size: 9px; letter-spacing: 0.18em; margin-top: 10px; }
-    .hero-bottom { left: 28px; bottom: 28px; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;cursor:none;}
+    html,body{width:100%;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font-type);overflow:hidden;}
 
-    .cap-item { grid-template-columns: 1fr; }
-    .cap-divider { display: none; }
-    .cap-left, .cap-right { padding: 48px 28px; }
-    .cap-right { padding-top: 0; }
+    /* CURSOR */
+    .cursor{position:fixed;width:7px;height:7px;background:var(--ink);border-radius:50%;pointer-events:none;z-index:9000;left:var(--cx);top:var(--cy);transform:translate(-50%,-50%) scale(1);transition:transform 0.12s ease,background 0.12s ease;}
+    .cursor.clicking{transform:translate(-50%,-50%) scale(2.8);background:var(--accent);}
 
-    .philosophy { grid-template-columns: 1fr; gap: 60px; padding: 80px 28px; }
-    .locations { padding: 60px 28px; }
-    .loc-dot { margin: 0 20px; }
-    .contact { padding: 80px 28px; }
+    /* DOTS */
+    .dot{display:inline-block;width:8px;height:8px;background:var(--accent);border-radius:50%;flex-shrink:0;vertical-align:middle;}
+    .dot-sm{display:inline-block;width:6px;height:6px;background:var(--accent);border-radius:50%;flex-shrink:0;vertical-align:middle;}
+    .logo-dot-yellow{color:var(--accent);font-size:1.6em;line-height:0;vertical-align:-0.15em;padding:0 3px;cursor:pointer;user-select:none;}
 
-    .form-row { grid-template-columns: 1fr; }
-    .form-row .field:first-child input { border-right: none; padding-right: 0; }
-    .form-row .field:last-child input { padding-left: 0; }
+    /* SCREENS */
+    .screen{position:fixed;inset:0;opacity:0;pointer-events:none;transition:opacity 0.5s var(--ease);}
+    .screen.active{opacity:1;pointer-events:all;}
 
-    footer { padding: 32px 28px; flex-direction: column; gap: 12px; text-align: center; }
-  }
-</style>
+    /* LOGO MARK */
+    .logo-mark{font-family:var(--font-type);font-size:var(--sz-logo);color:var(--ink);display:flex;align-items:baseline;gap:0;}
+
+    /* GLOBAL NAV — always rendered, z-index above everything */
+    #global-nav{
+      position:fixed;inset:0;pointer-events:none;z-index:500;
+    }
+    #global-nav .gnav-tl{
+      position:absolute;top:var(--edge);left:var(--edge);
+      display:flex;align-items:center;gap:0.6em;
+      pointer-events:all;
+    }
+    #global-nav .gnav-br{
+      position:absolute;bottom:var(--edge);right:var(--edge);
+      pointer-events:all;
+    }
+    #global-nav .gnav-bc{
+      position:absolute;bottom:var(--edge);left:50%;transform:translateX(-50%);
+      pointer-events:all;
+    }
+    /* hide back on intro/sections */
+    #global-nav.hide-back .back-btn{display:none;}
+    #global-nav.hide-ask  .ask-btn {display:none;}
+    /* on ask screen, hide bottom-center ask too */
+    #global-nav.hide-ask  .gnav-bc  {display:none;}
+
+    .back-btn{
+      font-family:var(--font-type);font-size:var(--sz-noise);
+      color:var(--muted);letter-spacing:0.04em;
+      transition:color 0.15s;user-select:none;
+      background:none;border:none;padding:0;
+    }
+    .back-btn:hover{color:var(--ink);}
+
+    .ask-btn{
+      display:flex;align-items:center;gap:0.35em;
+      background:none;border:none;font-family:var(--font-type);
+      font-size:var(--sz-micro);color:var(--muted);letter-spacing:0.1em;
+      transition:color 0.2s;padding:0;
+    }
+    .ask-btn:hover{color:var(--ink);}
+
+    /* FOOTER (static text only — no nav buttons) */
+    .sfooter{
+      position:absolute;bottom:var(--edge);left:var(--edge);right:var(--edge);
+      display:flex;justify-content:space-between;align-items:center;
+      font-size:var(--sz-micro);letter-spacing:0.1em;color:var(--muted);z-index:10;
+    }
+
+    /* NOISE */
+    .noise-block{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;word-break:break-word;}
+    .n-hi{color:var(--ink);font-weight:bold;}
+    .n-label{color:var(--ink);font-weight:bold;transition:color 0.15s;white-space:nowrap;}
+    .n-label:hover{color:var(--accent);}
+    .n-logo{font-weight:bold;color:var(--ink);white-space:nowrap;transition:color 0.15s;}
+    .n-logo:hover{color:var(--accent);}
+
+    /* INTRO */
+    #screen-intro{position:fixed;inset:0;overflow:hidden;}
+    .intro-noise-col{position:absolute;inset:0;padding:10vh 2rem;overflow:hidden;}
+    .intro-noise-col .noise-block{line-height:2;}
+
+    /* WHO */
+    #screen-who{display:flex;align-items:center;justify-content:center;}
+    .who-inner{max-width:560px;width:100%;padding:4rem 2rem 5rem;margin:0 auto;overflow-y:auto;max-height:100vh;}
+    .who-noise-mid{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;margin:1.6rem 0;}
+    .who-term{font-size:clamp(0.95rem,1.55vw,1.1rem);font-weight:bold;}
+    .who-pos{font-style:italic;color:var(--muted);font-size:var(--sz-body);margin-left:0.5em;}
+    .who-def{font-size:var(--sz-def);line-height:1.9;margin-top:0.55rem;}
+    .who-divider{border:none;border-top:1px solid var(--noise-col);margin:2.2rem 0;}
+    .who-name{font-size:var(--sz-body);font-weight:bold;margin-bottom:0.3rem;}
+    .who-role{font-size:var(--sz-noise);color:var(--muted);letter-spacing:0.06em;margin-bottom:0.7rem;}
+    .who-bio{font-size:var(--sz-def);line-height:1.9;}
+
+    /* WHAT */
+    #screen-what{display:flex;align-items:center;justify-content:center;}
+    .what-band{width:100%;height:100%;display:flex;align-items:stretch;}
+    .what-side{flex:1;background:var(--bg);}
+    .what-noise-col{flex:0 0 33.333%;min-height:100%;padding:3vh 1.8rem;overflow:hidden;}
+
+    /* ENCYCLOPEDIA */
+    #screen-patterns,#screen-legalintel,#screen-cookingdata,#screen-obvious{display:flex;align-items:center;justify-content:center;}
+    .enc-inner{max-width:560px;width:100%;padding:5rem 2rem;}
+    .enc-noise{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;margin-bottom:1.8rem;}
+    .enc-noise-bot{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;margin-top:1.6rem;}
+    .enc-term{font-size:clamp(0.95rem,1.55vw,1.1rem);font-weight:bold;}
+    .enc-pos{font-style:italic;color:var(--muted);font-size:var(--sz-body);margin-left:0.5em;}
+    .enc-def{font-size:var(--sz-def);line-height:1.9;margin-top:0.55rem;}
+
+    /* ASK */
+    #screen-ask{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;}
+    .ask-heading{display:flex;align-items:center;gap:0.5em;font-size:var(--sz-ask);font-weight:bold;}
+    .ask-form{width:100%;max-width:320px;padding:0 1.5rem;opacity:0;transform:translateY(12px);transition:opacity 0.55s var(--ease),transform 0.55s var(--ease);}
+    .ask-form.show{opacity:1;transform:translateY(0);}
+    .ask-field{width:100%;background:transparent;border:none;border-bottom:1px solid var(--ink);font-family:var(--font-type);font-size:var(--sz-body);color:var(--ink);padding:0.45rem 0;outline:none;}
+    .ask-field::placeholder{color:var(--noise-col);}
+    .ask-send{display:block;margin-top:1.2rem;background:none;border:none;font-family:var(--font-type);font-size:var(--sz-micro);letter-spacing:0.14em;color:var(--muted);padding:0;transition:color 0.2s;}
+    .ask-send:hover{color:var(--ink);}
+    @keyframes blink-ask{0%,100%{opacity:1}50%{opacity:0}}
+    .ask-heading.blinking{animation:blink-ask 0.7s ease-in-out 3;}
+
+    /* WHY / WHERE */
+    #screen-why,#screen-where{display:flex;align-items:center;justify-content:center;}
+    .sec-inner{max-width:560px;width:100%;padding:5rem 2rem;}
+    .sec-noise{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;margin-bottom:1.8rem;}
+    .sec-noise-mid{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;margin:1.6rem 0;}
+    .sec-term{font-size:clamp(0.95rem,1.55vw,1.1rem);font-weight:bold;}
+    .sec-pos{font-style:italic;color:var(--muted);font-size:var(--sz-body);margin-left:0.5em;}
+    .sec-def{font-size:var(--sz-def);line-height:1.9;margin-top:0.55rem;}
+    .sec-body{font-size:var(--sz-def);line-height:1.9;}
+
+    /* SCREENSAVER */
+    #ee-overlay{position:fixed;inset:0;z-index:9998;background:#000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.5s;overflow:hidden;}
+    #ee-overlay.show{opacity:1;pointer-events:all;}
+    #ee-hacker{position:absolute;inset:0;padding:2.5vh 2.5vw;font-family:'Barlow Condensed',monospace;font-size:clamp(0.65rem,1.1vw,0.9rem);color:#2a2a2a;line-height:1.6;overflow:hidden;white-space:pre-wrap;word-break:break-all;}
+    #ee-logo{position:relative;z-index:2;font-family:'Special Elite',serif;font-size:clamp(2rem,5.5vw,5rem);color:#fff;letter-spacing:0.03em;line-height:1;text-align:center;}
+    #ee-overlay.yellow{background:#FFD600;}
+    #ee-overlay.yellow #ee-logo{color:#000;}
+    #ee-overlay.yellow #ee-hacker{color:#c8a800;}
+    .ee-lchar{opacity:0;display:inline;}
+    .ee-lchar.on{opacity:1;}
+    .ee-dot{color:#FFD600;}
+    #ee-overlay.yellow .ee-dot{color:#000;}
+
+    /* SECTIONS */
+    #screen-sections{overflow:hidden;display:flex;align-items:stretch;height:100vh;}
+    .sections-left{flex:1;}
+    .sections-noise-col{flex:0 0 33vw;width:33vw;height:100vh;padding:3vh 1.5rem;overflow:hidden;box-sizing:border-box;position:relative;}
+    .sections-noise-col .noise-block{position:absolute;top:0;left:1.5rem;right:1.5rem;line-height:1.85;font-size:var(--sz-noise);color:var(--noise-col);z-index:0;}
+
+    /* BB */
+    #bb-overlay{position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.6s;overflow:hidden;}
+    #bb-overlay.show{opacity:1;pointer-events:all;}
+    #bb-light{position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:0;height:0;border-left:0px solid transparent;border-right:0px solid transparent;border-top:0px solid rgba(255,255,255,0);transition:none;}
+    #bb-overlay.lit #bb-light{border-left:60vw solid transparent;border-right:60vw solid transparent;border-top:130vh solid rgba(255,255,255,0.07);transition:border-top-width 1.2s ease-out,border-left-width 1.2s ease-out,border-right-width 1.2s ease-out;}
+    #bb-text{position:relative;z-index:2;font-family:'Special Elite',serif;font-size:clamp(1.4rem,3.5vw,3rem);color:#fff;text-align:center;letter-spacing:0.06em;line-height:1.6;opacity:0;transition:opacity 0.8s;}
+    #bb-overlay.textshow #bb-text{opacity:1;}
+    .bb-char{opacity:0;display:inline;}
+    .bb-char.on{opacity:1;}
+
+    /* CITY NAV */
+    .city-nav{position:absolute;bottom:2rem;left:2rem;display:flex;gap:1.2rem;font-family:var(--font-type);font-size:var(--sz-micro);color:var(--muted);letter-spacing:0.08em;z-index:10;}
+    .city-nav span{cursor:pointer;transition:color 0.15s;user-select:none;}
+    .city-nav span:hover{color:var(--ink);}
+    .city-nav .logo-dot-yellow{margin-left:0.3em;font-size:1em;vertical-align:0;}
+
+    ::-webkit-scrollbar{width:2px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:var(--noise-col);}
+  </style>
 </head>
 <body>
 
-<nav>
-  <div class="logo">38<span>Zebra</span>Lab</div>
-  <a href="#contact" class="nav-cta">Get in touch</a>
-</nav>
+<div class="cursor"></div>
 
-<!-- HERO -->
-<section class="hero">
-  <img class="hero-zebra-img" src="https://i.postimg.cc/4dymBbVP/Untitled-(1).png" alt="Zebra">
-  <div class="hero-overlay"></div>
-  <div class="hero-text">
-    <div class="hero-tagline">NOW<span class="dot">.</span> BEFORE IT'S OBVIOUS<span class="dot">.</span></div>
-    <div class="hero-sub">Legal · Asset · Advisory · Compliance · Web</div>
+<!-- GLOBAL NAV — rendered once, always on top -->
+<div id="global-nav" class="hide-back">
+  <div class="gnav-tl">
+    <div class="logo-mark" id="nav-logo" style="cursor:pointer;">38ZebraLab<span class="logo-dot-yellow">.</span></div>
+    <button class="back-btn" id="nav-back">← back</button>
   </div>
-  <div class="hero-bottom">
-    <div class="hero-bottom-line"></div>
-    <div class="hero-bottom-text">Miami · New York · Milano</div>
+  <div class="gnav-bc">
+    <button class="ask-btn" id="nav-ask-bc"><span class="dot-sm"></span><span>Ask</span></button>
   </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- CAPABILITIES -->
-<section class="capabilities" id="capabilities">
-  <div class="cap-item fade-in">
-    <div class="cap-left">
-      <div class="cap-num">Legal Intelligence</div>
-      <div class="cap-headline"><strong>The law is the same.</strong><em>The reading isn't.</em></div>
-    </div>
-    <div class="cap-divider"></div>
-    <div class="cap-right">
-      <div class="cap-tag">Regulation as competitive advantage</div>
-      <div class="cap-tag">Jurisdictional arbitrage</div>
-      <div class="cap-tag">Early-warning legal mapping</div>
-      <div class="cap-tag">We read the law before the memo lands</div>
-    </div>
-  </div>
-  <div class="cap-item fade-in">
-    <div class="cap-left">
-      <div class="cap-num">Asset Intelligence</div>
-      <div class="cap-headline"><strong>Raw data.</strong><em>We cook it.</em></div>
-    </div>
-    <div class="cap-divider"></div>
-    <div class="cap-right">
-      <div class="cap-tag">Real estate · Private equity · Alternative assets</div>
-      <div class="cap-tag">Market mapping before the price moves</div>
-      <div class="cap-tag">Intelligence that stays off the pitch deck</div>
-    </div>
-  </div>
-  <div class="cap-item fade-in">
-    <div class="cap-left">
-      <div class="cap-num">Strategic Advisory</div>
-      <div class="cap-headline"><strong>Numbers that survive</strong><em>the other room.</em></div>
-    </div>
-    <div class="cap-divider"></div>
-    <div class="cap-right">
-      <div class="cap-tag">Due diligence that holds under adversarial scrutiny</div>
-      <div class="cap-tag">Forecasts built to be attacked — and to survive</div>
-      <div class="cap-tag">No slide decks. No theater.</div>
-    </div>
-  </div>
-  <div class="cap-item fade-in">
-    <div class="cap-left">
-      <div class="cap-num">Emerging Compliance</div>
-      <div class="cap-headline"><strong>We write the checklist</strong><em>before the rule exists.</em></div>
-    </div>
-    <div class="cap-divider"></div>
-    <div class="cap-right">
-      <div class="cap-tag">AI · Crypto · Cross-border regulatory frameworks</div>
-      <div class="cap-tag">Ahead of enforcement, not behind it</div>
-      <div class="cap-tag">Compliance as a strategic position</div>
-    </div>
-  </div>
-  <div class="cap-item fade-in">
-    <div class="cap-left">
-      <div class="cap-num">Web Development</div>
-      <div class="cap-headline"><strong>Built to work.</strong><em>Designed to last.</em></div>
-    </div>
-    <div class="cap-divider"></div>
-    <div class="cap-right">
-      <div class="cap-tag">Product interfaces & client portals</div>
-      <div class="cap-tag">Precision engineering, not template assembly</div>
-      <div class="cap-tag">Infrastructure that scales with the decision</div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- PHILOSOPHY -->
-<section class="philosophy">
-  <div class="phil-left fade-in">
-    <p class="phil-quote">"The most valuable intelligence is the kind that <strong>changes the decision</strong> — not just confirms it."</p>
-    <div class="phil-attr">— 38ZebraLab</div>
-  </div>
-  <div class="phil-right">
-    <div class="phil-stat fade-in"><div class="phil-stat-num">5</div><div class="phil-stat-label">Integrated practice areas</div></div>
-    <div class="phil-stat fade-in"><div class="phil-stat-num">B2B + B2C</div><div class="phil-stat-label">Serving both institutional and individual clients</div></div>
-    <div class="phil-stat fade-in"><div class="phil-stat-num">01</div><div class="phil-stat-label">Principle: clarity over complexity</div></div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- LOCATIONS -->
-<div class="locations fade-in">
-  <span class="loc-name">Miami</span>
-  <span class="loc-dot"></span>
-  <span class="loc-name">New York</span>
-  <span class="loc-dot"></span>
-  <span class="loc-name">Milano</span>
 </div>
 
-<div class="divider"></div>
+<div id="ee-overlay"><div id="ee-hacker"></div><div id="ee-logo"></div></div>
+<div id="bb-overlay"><div id="bb-light"></div><div id="bb-text"></div></div>
 
-<!-- CONTACT -->
-<section class="contact fade-in" id="contact">
-  <div class="contact-line">
-    If you found us,<br><em>you were already looking.</em>
+<!-- INTRO -->
+<div class="screen active" id="screen-intro">
+  <div class="intro-noise-col"><div class="noise-block" id="intro-noise"></div></div>
+</div>
+
+<!-- SECTIONS -->
+<div class="screen" id="screen-sections">
+  <div class="sections-left"></div>
+  <div class="sections-noise-col" id="sections-col"></div>
+  <div class="sfooter">
+    <span>MIAMI · MILANO · NEW YORK</span>
+    <span></span>
+    <span>EST. 2026</span>
   </div>
+</div>
 
-  <!-- Netlify form — the netlify attribute tells Netlify to handle submissions -->
-  <form
-    class="contact-form"
-    name="contact"
-    method="POST"
-    data-netlify="true"
-    netlify-honeypot="bot-field"
-    id="contact-form"
-  >
-    <!-- Hidden fields required by Netlify -->
-    <input type="hidden" name="form-name" value="contact">
-    <p style="display:none"><input name="bot-field"></p>
-
-    <div class="form-row">
-      <div class="field">
-        <input type="text" name="name" placeholder="Name" required>
-      </div>
-      <div class="field">
-        <input type="email" name="email" placeholder="Email" required>
-      </div>
-    </div>
-    <div class="field">
-      <input type="tel" name="phone" placeholder="Phone">
-    </div>
-    <div class="field">
-      <textarea name="message" placeholder="Message" required></textarea>
-    </div>
-    <button type="submit" class="form-submit">Send message</button>
-  </form>
-
-  <!-- Thank you state (shown after submit) -->
-  <div class="thankyou" id="thankyou">
-    <div class="thankyou-icon">
-      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-    </div>
-    <div class="thankyou-title">Message received.</div>
-    <div class="thankyou-sub">We'll be in touch shortly.</div>
+<!-- WHO -->
+<div class="screen" id="screen-who">
+  <div class="who-inner">
+    <p class="who-name">Tommaso</p>
+    <p class="who-role">CO-FOUNDER · DATA</p>
+    <p class="who-bio">Columbia MS, Sports Management. Specializes in sports data — finding the signal inside performance numbers that teams and organizations haven't learned to read yet. Builds systems that see what the eye misses.</p>
+    <hr class="who-divider">
+    <p class="who-name">Giorgio</p>
+    <p class="who-role">CO-FOUNDER · LEGAL · STRATEGY</p>
+    <p class="who-bio">Thirty years at the top of Italian litigation. The kind of work that ends at the Supreme Court. Closing tables in Miami on weekends.</p>
+    <hr class="who-divider">
+    <div class="who-noise-mid" id="who-noise-top"></div>
+    <div><span class="who-term">Pattern Architects</span><span class="who-pos">n. phr.</span></div>
+    <p class="who-def">We work with few. The right ones. Companies and individuals operating at the intersection of ambition and complexity — who understand that the first-mover advantage belongs to those who ask better questions, not louder ones.</p>
+    <div class="who-noise-mid" id="who-noise-mid"></div>
   </div>
-</section>
+  <div class="sfooter"><span>01 — WHO</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
 
-<footer>
-  <div class="footer-logo">38<span>Zebra</span>Lab</div>
-  <div class="footer-copy">© 2026 38ZebraLab. All rights reserved.</div>
-</footer>
+<!-- WHAT -->
+<div class="screen" id="screen-what">
+  <div class="what-band">
+    <div class="what-side"></div>
+    <div class="what-noise-col"><div class="noise-block" id="what-noise"></div></div>
+    <div class="what-side"></div>
+  </div>
+  <div class="sfooter"><span>02 — WHAT</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
+
+<!-- ENCYCLOPEDIA -->
+<div class="screen" id="screen-patterns">
+  <div class="enc-inner">
+    <div class="enc-noise" id="enc-noise-patterns"></div>
+    <div><span class="enc-term">Patterns</span><span class="enc-pos">n. pl.</span></div>
+    <p class="enc-def">The recurring geometry of events that most observers mistake for coincidence. A pattern is not a trend — it is the structural logic beneath behavior, data, and decision. The first thing we look for. The last thing most people see. Recognizing a pattern before it becomes obvious is the only sustainable form of competitive advantage.</p>
+    <div class="enc-noise-bot" id="enc-noise-patterns-bot"></div>
+  </div>
+  <div class="sfooter"><span>WHAT — PATTERNS</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
+
+<div class="screen" id="screen-legalintel">
+  <div class="enc-inner">
+    <div class="enc-noise" id="enc-noise-legalintel"></div>
+    <div><span class="enc-term">Legal Intelligence</span><span class="enc-pos">n. phr.</span></div>
+    <p class="enc-def">The application of legal structure as a strategic instrument — not a constraint. The capacity to navigate regulatory, contractual, and jurisdictional complexity not to avoid risk, but to architect advantage. Where most see limits, legal intelligence finds the design space.</p>
+    <div class="enc-noise-bot" id="enc-noise-legalintel-bot"></div>
+  </div>
+  <div class="sfooter"><span>WHAT — LEGAL INTELLIGENCE</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
+
+<div class="screen" id="screen-cookingdata">
+  <div class="enc-inner">
+    <div class="enc-noise" id="enc-noise-cookingdata"></div>
+    <div><span class="enc-term">Cooking Data</span><span class="enc-pos">n. phr.</span></div>
+    <p class="enc-def">The art of extracting and combining data in unconventional ways to obtain something extraordinary. A discipline that operates where analysis ends and intuition begins — transforming raw, overlooked, or seemingly unrelated information into products, decisions, and advantages that conventional methods would never have produced.</p>
+    <div class="enc-noise-bot" id="enc-noise-cookingdata-bot"></div>
+  </div>
+  <div class="sfooter"><span>WHAT — COOKING DATA</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
+
+<div class="screen" id="screen-obvious">
+  <div class="enc-inner">
+    <div class="enc-noise" id="enc-noise-obvious"></div>
+    <div><span class="enc-term">Before It's Obvious</span><span class="enc-pos">adv. phr.</span></div>
+    <p class="enc-def">The only moment that produces non-consensus returns. After something becomes obvious, the advantage is already distributed. The work we do exists almost entirely in the interval between signal emergence and common recognition — which is, by definition, the interval that cannot be systematized.</p>
+    <div class="enc-noise-bot" id="enc-noise-obvious-bot"></div>
+  </div>
+  <div class="sfooter"><span>WHAT — BEFORE IT'S OBVIOUS</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
+
+<!-- WHY -->
+<div class="screen" id="screen-why">
+  <div class="sec-inner">
+    <div class="sec-noise" id="why-noise-top"></div>
+    <div><span class="sec-term">Asymmetric Leverage</span><span class="sec-pos">n. phr.</span></div>
+    <p class="sec-def">Most organizations apply uniform force to every problem. This is efficient and consistently wrong. A single precise question — asked before anyone else knows to ask it — produces results that no volume of effort applied afterward can replicate. We exist for that question. The one that makes the solution obvious in hindsight and invisible in advance. The work is finding it before hindsight arrives.</p>
+    <div class="sec-noise-mid" id="why-noise-mid"></div>
+    <p class="sec-body">Because complexity is not the problem. The absence of a sharper question is.</p>
+  </div>
+  <div class="sfooter"><span>03 — WHY</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
+
+<!-- WHERE -->
+<div class="screen" id="screen-where">
+  <div class="sec-inner">
+    <div class="sec-noise" id="where-noise-top"></div>
+    <div><span class="sec-term">Operational Radius</span><span class="sec-pos">n. phr.</span></div>
+    <p class="sec-def">The condition in which presence is not a location — it is a decision. We do not open offices where markets are comfortable. We position where the complexity is.</p>
+    <div class="sec-noise-mid" id="where-noise-mid"></div>
+    <p class="sec-body">Built in Milano. Engineered in New York. Based in Miami. Dispatched everywhere else.<br><br>Where they need. Where they hide.</p>
+  </div>
+  <div class="sfooter"><span>04 — WHERE</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
+
+<!-- ASK -->
+<div class="screen" id="screen-ask">
+  <div class="ask-heading" id="ask-heading"><span class="dot"></span><span>Ask</span></div>
+  <div class="ask-form" id="ask-form">
+    <input type="email" class="ask-field" id="ask-email" placeholder="your@email.com">
+    <button class="ask-send" id="ask-send-btn">→ send</button>
+    <p id="ask-confirm" style="margin-top:1rem;font-size:var(--sz-micro);letter-spacing:0.1em;color:var(--muted);opacity:0;transition:opacity 0.5s;">message sent.</p>
+  </div>
+  <div class="sfooter"><span>ASK</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
 
 <script>
-  // Fade-in observer
-  const els = document.querySelectorAll('.fade-in');
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach((e, i) => {
-      if (e.isIntersecting) {
-        setTimeout(() => e.target.classList.add('visible'), i * 80);
-        obs.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.1 });
-  els.forEach(el => obs.observe(el));
+(function(){
+'use strict';
 
-  // Netlify form: show thank-you on success, no page reload
-  const form = document.getElementById('contact-form');
-  const thankyou = document.getElementById('thankyou');
+/* ── NAV ROUTING ── */
+// back destination map
+var BACK_MAP = {
+  'who':         'sections',
+  'what':        'sections',
+  'why':         'sections',
+  'where':       'sections',
+  'ask':         'sections',
+  'patterns':    'what',
+  'legalintel':  'what',
+  'cookingdata': 'what',
+  'obvious':     'what',
+  'sections':    'intro'
+};
+// screens where back is hidden
+var NO_BACK  = {'intro':true};
+// screens where ask is hidden
+var NO_ASK   = {'intro':true,'ask':true};
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = new FormData(form);
-    try {
-      await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(data).toString()
+var gnav    = document.getElementById('global-nav');
+var navLogo = document.getElementById('nav-logo');
+var navBack = document.getElementById('nav-back');
+var navAsk  = document.getElementById('nav-ask-bc');
+
+navLogo.addEventListener('click', function(){
+  var dest = current === 'intro' ? 'intro' : 'sections';
+  showScreen(dest);
+});
+navBack.addEventListener('click', function(){
+  var dest = BACK_MAP[current] || 'sections';
+  showScreen(dest);
+});
+navAsk.addEventListener('click', function(){ showScreen('ask'); });
+
+function updateNav(name){
+  if(NO_BACK[name])  gnav.classList.add('hide-back');
+  else               gnav.classList.remove('hide-back');
+  if(NO_ASK[name]){ gnav.classList.add('hide-ask'); }
+  else{ gnav.classList.remove('hide-ask'); }
+}
+
+/* ── SCREENSAVER ── */
+(function(){
+  var done=false,running=false,idleTimer=null,timerStarted=false;
+  var IDLE=20000;
+  var HK=['0x4e554c4c','SIGSEGV','malloc(0)','free(NULL)','0xdeadbeef',
+    'root@zebralab:~#','sudo -i','chmod 000','rm -rf /','fork()','exec()',
+    '/proc/self/mem','[stack]','[heap]','ASLR disabled','NX bit','ROP chain',
+    'jmp 0x08048000','push eax','xor eax eax','int 0x80',
+    'CVE-2026-????','buffer overflow','heap spray','use-after-free',
+    'privilege escalation','lateral movement','persistence established',
+    'exfil complete','C2 beacon','payload deployed','keylogger active',
+    'found: 1 critical','found: 4 high','CVSS: 9.8','patch: NONE',
+    'signal','pattern','leverage','asymmetric','38ZebraLab'];
+  function hkw(){return HK[Math.floor(Math.random()*HK.length)];}
+  function hkline(){var n=6+Math.floor(Math.random()*8),a=[];for(var i=0;i<n;i++)a.push(hkw());return a.join('  ');}
+  function launch(){
+    if(done||running)return; running=true;
+    var ov=document.getElementById('ee-overlay'),hk=document.getElementById('ee-hacker'),lg=document.getElementById('ee-logo');
+    ov.classList.remove('yellow'); hk.style.opacity='1'; hk.textContent='';
+    lg.textContent=''; lg.style.opacity='1'; lg.style.transition='';
+    ov.classList.add('show');
+    var lc=Math.floor(window.innerHeight/20)+2,lines=[];
+    var hiv=setInterval(function(){ lines.push(hkline()); if(lines.length>lc)lines.shift(); hk.textContent=lines.join('\n'); },55);
+    setTimeout(function(){
+      clearInterval(hiv);
+      var fl=0,fiv=setInterval(function(){ hk.style.opacity=fl%2===0?'0':'1'; fl++; if(fl>=8){clearInterval(fiv);hk.style.opacity='0';} },70);
+    },1800);
+    var LOGO='38ZebraLab';
+    setTimeout(function(){
+      lg.textContent=''; lg.style.cursor='pointer';
+      lg.onclick=function(){ ov.classList.remove('show','yellow'); ov.style.opacity=''; done=true; running=false; showScreen('ask'); };
+      LOGO.split('').forEach(function(ch,i){ var sp=document.createElement('span'); sp.className='ee-lchar'; sp.textContent=ch; lg.appendChild(sp); setTimeout(function(){sp.classList.add('on');},i*100); });
+      var dot=document.createElement('span'); dot.className='ee-lchar ee-dot'; dot.textContent='.'; lg.appendChild(dot);
+      setTimeout(function(){dot.classList.add('on');},LOGO.length*100);
+    },2300);
+    var logoEnd=2300+LOGO.length*100+400;
+    setTimeout(function(){
+      ov.classList.add('yellow'); lg.style.transition='opacity 0.3s'; lg.style.opacity='0';
+      setTimeout(function(){
+        lg.textContent=''; lg.style.opacity='1';
+        var PH='you need us. you just realized.';
+        PH.split('').forEach(function(ch,i){ var sp=document.createElement('span'); sp.className='ee-lchar'; sp.textContent=ch; lg.appendChild(sp); setTimeout(function(){sp.classList.add('on');},i*55); });
+        setTimeout(function(){
+          ov.style.transition='opacity 0.9s'; ov.style.opacity='0';
+          setTimeout(function(){ ov.classList.remove('show','yellow'); ov.style.transition=''; ov.style.opacity=''; hk.style.opacity='1'; done=true; running=false; },1000);
+        },PH.length*55+900);
+      },400);
+    },logoEnd);
+  }
+  window._goStart=function(){if(done||timerStarted)return;timerStarted=true;idleTimer=setTimeout(launch,IDLE);};
+  window._goStop=function(){clearTimeout(idleTimer);timerStarted=false;};
+})();
+
+/* ── CURSOR ── */
+var _cur=document.querySelector('.cursor');
+document.addEventListener('mousedown',function(){_cur&&_cur.classList.add('clicking');});
+document.addEventListener('mouseup',function(){_cur&&_cur.classList.remove('clicking');});
+document.addEventListener('mousemove',function(e){
+  document.documentElement.style.setProperty('--cx',e.clientX+'px');
+  document.documentElement.style.setProperty('--cy',e.clientY+'px');
+});
+
+/* ── NOISE POOL ── */
+var NP=[
+  'clause','nexus','leverage','equity','exposure','jurisdiction','arbitrage',
+  'carve-out','brief','ruling','motion','tenor','yield','spread','carry',
+  'delta','alpha','clearing','settlement','hedge','proxy','floor','ceiling',
+  'threshold','covenant','pledge','lien','warrant','disclosure','escrow',
+  'holdback','collateral','due diligence','indemnity','waiver','closing',
+  'signal','inference','prior','posterior','entropy','regime','velocity',
+  'momentum','trigger','outlier','anomaly','cluster','weight','vector',
+  'latency','corpus','pattern','edge','ratio','variance','drift','baseline',
+  'standing','appeal','record','filing','judgment','precedent','doctrine',
+  'counsel','court','verdict','opinion','dissent','injunction','sanction',
+  'deposition','subpoena','affidavit','statute','regulation','compliance',
+  'Miami','Milano','Manhattan','Zurich','London','Delaware','Luxembourg',
+  'Cayman','Basel','Geneva','Singapore','Dubai','Hong Kong','Nassau',
+  'Trump','Epstein','island','Maxwell','Ghislaine','Hillary','Clinton',
+  'oil','Iran','Maduro','Venezuela','BVI','offshore','indictment',
+  'classified','leaked','whistleblower','immunity','pardon','seizure',
+  'extradition','freeze','blacklist','redacted','declassified','sanction',
+  'tariffs','Fed','inflation','recession','bailout','impeachment',
+  'algorithm','model','inference','training','deployment','hallucination',
+  'token','embedding','latency','pipeline','vector','cluster','weight',
+  'benchmark','fine-tune','prompt','context','entropy','temperature'
+];
+(function(){
+  try{
+    var url='https://api.allorigins.win/raw?url='+encodeURIComponent('https://trends.google.com/trends/trendingsearches/daily/rss?geo=US');
+    fetch(url).then(function(r){return r.text();}).then(function(xml){
+      var m=xml.match(/<title><!\[CDATA\[([^\]]+)\]\]><\/title>/g)||[];
+      m.slice(0,20).forEach(function(t){
+        var term=t.replace(/<[^>]+>/g,'').replace(/CDATA\[|\]\]/g,'').trim();
+        if(term&&term.length>2&&term!=='Google Trends') term.split(/\s+/).forEach(function(w){if(w.length>3)NP.push(w);});
       });
-      form.style.display = 'none';
-      thankyou.style.display = 'flex';
-    } catch (err) {
-      alert('Something went wrong. Please try again.');
-    }
+    }).catch(function(){});
+  }catch(e){}
+})();
+function rw(){return NP[Math.floor(Math.random()*NP.length)];}
+function rws(n){var a=[];for(var i=0;i<n;i++)a.push(rw());return a;}
+
+function staticNoise(id,n){var el=document.getElementById(id);if(el)el.textContent=rws(n).join(' ');}
+function renderPlain(c,w){c.innerHTML='';for(var i=0;i<w.length;i++){var s=document.createElement('span');s.textContent=w[i]+' ';c.appendChild(s);}}
+function renderLabels(c,w,p){
+  c.innerHTML='';
+  for(var i=0;i<w.length;i++){
+    var item=null;for(var j=0;j<p.length;j++){if(p[j].pos===i){item=p[j];break;}}
+    if(item){var s=document.createElement('span');s.className='n-label';s.textContent=item.text+' ';if(item.target){(function(t){s.onclick=function(){showScreen(t);};})(item.target);}c.appendChild(s);}
+    else{var s2=document.createElement('span');s2.textContent=w[i]+' ';c.appendChild(s2);}
+  }
+}
+function renderLogo(c,w,pos){
+  c.innerHTML='';
+  for(var i=0;i<w.length;i++){
+    if(i===pos){var wrap=document.createElement('span');wrap.className='n-logo';wrap.onclick=function(){showScreen('sections');};wrap.appendChild(document.createTextNode('38ZebraLab'));var yd=document.createElement('span');yd.className='logo-dot-yellow';yd.textContent='.';wrap.appendChild(yd);wrap.appendChild(document.createTextNode(' '));c.appendChild(wrap);}
+    else{var s=document.createElement('span');s.textContent=w[i]+' ';c.appendChild(s);}
+  }
+}
+function placeLabels(w,items){
+  var taken=[],placed=[];
+  for(var i=0;i<items.length;i++){var pos,tries=0;do{pos=20+Math.floor(Math.random()*(w.length-40));tries++;}while(tooClose(taken,pos,15)&&tries<80);taken.push(pos);placed.push({text:items[i].text,target:items[i].target,pos:pos});}
+  return placed;
+}
+function tooClose(arr,pos,d){for(var i=0;i<arr.length;i++)if(Math.abs(arr[i]-pos)<d)return true;return false;}
+
+/* ── SCREEN MANAGER ── */
+var current='intro';
+var sectionsRunning=false, whatRunning=false;
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById('screen-'+name).classList.add('active');
+  current=name;
+  updateNav(name);
+  if(name==='who'){staticNoise('who-noise-top',28);staticNoise('who-noise-mid',22);}
+  if(name==='why'){staticNoise('why-noise-top',28);staticNoise('why-noise-mid',18);}
+  if(name==='where'){staticNoise('where-noise-top',28);staticNoise('where-noise-mid',18);}
+  if(name==='patterns'){staticNoise('enc-noise-patterns',20);staticNoise('enc-noise-patterns-bot',16);}
+  if(name==='legalintel'){staticNoise('enc-noise-legalintel',20);staticNoise('enc-noise-legalintel-bot',16);}
+  if(name==='cookingdata'){staticNoise('enc-noise-cookingdata',20);staticNoise('enc-noise-cookingdata-bot',16);}
+  if(name==='obvious'){staticNoise('enc-noise-obvious',20);staticNoise('enc-noise-obvious-bot',16);}
+  if(name==='ask') startAsk();
+  if(name==='sections'&&!sectionsRunning){sectionsRunning=true;runSections();}
+  if(name==='what'&&!whatRunning){whatRunning=true;runWhat();}
+  if(name==='sections') window._goStart&&window._goStart();
+  if(name==='intro'){window._goStop&&window._goStop();sectionsRunning=false;whatRunning=false;introClickEnabled=false;introLoop();}
+}
+
+/* ── INTRO ── */
+var introClickEnabled=false;
+document.getElementById('screen-intro').addEventListener('click',function(){
+  if(introClickEnabled&&current==='intro') showScreen('sections');
+});
+function getMottoIdx(){try{return parseInt(localStorage.getItem('zlb_motto')||'0',10)||0;}catch(e){return 0;}}
+function saveMottoIdx(n){try{localStorage.setItem('zlb_motto',String(n));}catch(e){}}
+var MOTTOS=[
+  'Raw data. We cook it.',
+  'Before it\'s obvious — that\'s the only moment we work in.',
+  'You ask the question. The tool is already built.',
+  'The signal is already there. Most people call it noise.',
+  'The pattern was always there. You just needed the right distance.',
+  'Milano to Miami is not a commute. It is a method.',
+  'The gap between disciplines is where the real work lives.',
+  'Precision is not caution. It is the opposite.',
+  'The answer was in the data. The question was the hard part.',
+  'We work with few. The right ones know why.',
+  'Most advantages expire. The ones built on judgment don\'t.',
+  'The best move in the room is the one no one expected you to know.'
+];
+function introLoop(){
+  var block=document.getElementById('intro-noise');
+  var words=rws(340);
+  var h1=setInterval(function(){if(current!=='intro'){clearInterval(h1);return;}words=words.slice(12).concat(rws(12));renderPlain(block,words);},120);
+  setTimeout(function(){
+    clearInterval(h1); if(current!=='intro')return;
+    var idx=getMottoIdx(),motto=MOTTOS[idx%MOTTOS.length]; saveMottoIdx((idx+1)%MOTTOS.length);
+    var mw=motto.split(' ');
+    var _zk='zlb_zone',_zi=0;
+    try{_zi=(parseInt(sessionStorage.getItem(_zk)||'0',10)+1)%3;sessionStorage.setItem(_zk,String(_zi));}catch(e){}
+    var zr=[[0.05,0.28],[0.36,0.64],[0.72,0.92]][_zi];
+    var ss=Math.floor(words.length*zr[0]),se=Math.floor(words.length*zr[1])-mw.length;
+    if(se<=ss)se=ss+1;
+    var pos=ss+Math.floor(Math.random()*(se-ss)),disp=words.slice(),bold={};
+    for(var i=0;i<mw.length;i++){var p=pos+i;if(p<disp.length){disp[p]=mw[i];bold[p]=true;}}
+    block.innerHTML='';
+    for(var i=0;i<disp.length;i++){var s=document.createElement('span');s.textContent=disp[i]+' ';if(bold[i])s.className='n-hi';block.appendChild(s);}
+    introClickEnabled=true;
+    setTimeout(function(){
+      if(current!=='intro')return;
+      var h2=setInterval(function(){if(current!=='intro'){clearInterval(h2);return;}words=words.slice(12).concat(rws(12));renderPlain(block,words);},120);
+      setTimeout(function(){
+        clearInterval(h2); if(current!=='intro')return;
+        var lzr=[[0.05,0.28],[0.36,0.64],[0.72,0.92]][_zi];
+        var ls=Math.floor(words.length*lzr[0]),le=Math.floor(words.length*lzr[1])-2;
+        if(le<=ls)le=ls+1;
+        renderLogo(block,words,ls+Math.floor(Math.random()*(le-ls)));
+      },2800);
+    },2800);
+  },3600);
+}
+
+/* ── SECTIONS ── */
+var SECT_ITEMS=[
+  {text:'Who',target:'who'},{text:'What',target:'what'},{text:'Why',target:'why'},
+  {text:'Where',target:'where'},{text:'Ask',target:'ask'},
+  {text:'Milano',target:'ask'},{text:'Miami',target:'ask'},{text:'New York',target:'ask'}
+];
+function runSections(){
+  var col=document.getElementById('sections-col'); col.innerHTML='';
+  var block=document.createElement('div'); block.className='noise-block'; col.appendChild(block);
+  var N=700, words=rws(N);
+  function mkSpan(word,isLabel,target){var s=document.createElement('span');if(isLabel){s.className='n-label';s.textContent=word+' ';s.onclick=(function(t){return function(){showScreen(t);};})(target);}else{s.textContent=(word||rw())+' ';}return s;}
+  function renderNoise(w){block.innerHTML='';w.forEach(function(word){block.appendChild(mkSpan(word,false,null));});}
+  function renderWithLabels(w){block.innerHTML='';w.forEach(function(word){if(word&&word.indexOf('|LBL|')===0){var p=word.slice(5).split('|');block.appendChild(mkSpan(p[0],true,p[1]));}else{block.appendChild(mkSpan(word,false,null));}});}
+  function injectLabels(w){var out=w.slice(),vN=Math.min(280,Math.floor(out.length*0.4)),slot=Math.floor(vN/SECT_ITEMS.length);if(slot<1)slot=1;SECT_ITEMS.forEach(function(item,i){var pos=i*slot+Math.floor(Math.random()*Math.max(1,slot-1));if(pos>=out.length)pos=out.length-1;out[pos]='|LBL|'+item.text+'|'+item.target;});return out;}
+  function stripLabels(w){return w.map(function(word){return(word&&word.indexOf('|LBL|')===0)?rw():word;});}
+  var scrollY=0,SCROLL_SPEED=0.6,rafId=null,frozen=false;
+  function startScroll(){if(rafId)cancelAnimationFrame(rafId);frozen=false;function step(){if(current!=='sections'||frozen){rafId=null;return;}scrollY+=SCROLL_SPEED;var bH=block.offsetHeight;if(scrollY>bH/2){scrollY=0;words=words.slice(Math.floor(N/2)).concat(rws(Math.floor(N/2)));if(!frozen)renderNoise(words);}block.style.transform='translateY(-'+scrollY+'px)';rafId=requestAnimationFrame(step);}rafId=requestAnimationFrame(step);}
+  function stopScroll(){frozen=true;if(rafId){cancelAnimationFrame(rafId);rafId=null;}}
+  function freezeWithLabels(){stopScroll();scrollY=0;block.style.transform='translateY(0)';words=injectLabels(words);renderWithLabels(words);}
+  renderNoise(words); startScroll();
+  setTimeout(function(){if(current!=='sections'){sectionsRunning=false;return;}freezeWithLabels();setTimeout(function(){if(current!=='sections'){sectionsRunning=false;return;}words=stripLabels(words);renderNoise(words);block.style.transform='translateY(-'+scrollY+'px)';startScroll();setTimeout(function(){if(current!=='sections'){sectionsRunning=false;return;}freezeWithLabels();},2800);},1200);},3000);
+}
+
+/* ── WHAT ── */
+var WHAT_ITEMS=[
+  {text:'Patterns',target:'patterns'},{text:'Legal Intelligence',target:'legalintel'},
+  {text:'Cooking Data',target:'cookingdata'},{text:"Before it's obvious",target:'obvious'}
+];
+function runWhat(){
+  var block=document.getElementById('what-noise'),words=rws(340);
+  renderPlain(block,words);
+  var h1=setInterval(function(){if(current!=='what'){clearInterval(h1);whatRunning=false;return;}words=words.slice(12).concat(rws(12));renderPlain(block,words);},120);
+  setTimeout(function(){clearInterval(h1);if(current!=='what'){whatRunning=false;return;}renderLabels(block,words,placeLabels(words,WHAT_ITEMS));setTimeout(function(){if(current!=='what'){whatRunning=false;return;}var h2=setInterval(function(){if(current!=='what'){clearInterval(h2);whatRunning=false;return;}words=words.slice(12).concat(rws(12));renderPlain(block,words);},120);setTimeout(function(){clearInterval(h2);if(current!=='what'){whatRunning=false;return;}renderLabels(block,words,placeLabels(words,WHAT_ITEMS));},2600);},2400);},3400);
+}
+
+/* ── ASK ── */
+function startAsk(){
+  var heading=document.getElementById('ask-heading'),form=document.getElementById('ask-form');
+  form.classList.remove('show'); heading.classList.remove('blinking'); void heading.offsetWidth;
+  heading.classList.add('blinking'); setTimeout(function(){form.classList.add('show');},2700);
+}
+document.getElementById('ask-send-btn').addEventListener('click',function(){
+  var email=document.getElementById('ask-email').value.trim(); if(!email)return;
+  window.location.href='mailto:g@38zebralab.ai?subject=38ZebraLab%20%E2%80%94%20Ask&body='+encodeURIComponent('From: '+email+'\n\n');
+  var conf=document.getElementById('ask-confirm'); conf.style.opacity='1';
+  document.getElementById('ask-email').value='';
+  setTimeout(function(){conf.style.opacity='0';},3000);
+});
+
+/* ── BLUES BROTHERS ── */
+(function(){
+  var clicks=0,timer=null,triggered=false;
+  function runBB(){
+    if(triggered)return; triggered=true;
+    var ov=document.getElementById('bb-overlay'),txt=document.getElementById('bb-text');
+    ov.classList.add('show'); setTimeout(function(){ov.classList.add('lit');},80);
+    var PH="We're putting the band back together.";
+    setTimeout(function(){txt.textContent='';PH.split('').forEach(function(ch,i){var sp=document.createElement('span');sp.className='bb-char';sp.textContent=ch;txt.appendChild(sp);setTimeout(function(){sp.classList.add('on');},i*55);});ov.classList.add('textshow');},1400);
+    setTimeout(function(){ov.style.transition='opacity 1.2s';ov.style.opacity='0';setTimeout(function(){ov.classList.remove('show','lit','textshow');ov.style.transition='';ov.style.opacity='';txt.textContent='';setTimeout(function(){triggered=false;},30000);},1300);},1400+PH.length*55+2200);
+  }
+  document.addEventListener('click',function(e){
+    if(!e.target.classList.contains('logo-dot-yellow')&&!e.target.closest('.logo-dot-yellow'))return;
+    clicks++; clearTimeout(timer);
+    if(clicks>=3){clicks=0;runBB();}else{timer=setTimeout(function(){clicks=0;},800);}
   });
+})();
+
+/* ── BOOT ── */
+updateNav('intro');
+introLoop();
+
+})();
 </script>
 </body>
 </html>
