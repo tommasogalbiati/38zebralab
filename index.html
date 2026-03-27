@@ -1,589 +1,533 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>38ZebraLab</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Barlow+Condensed:wght@100;400;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #F7F6F3; --ink: #1A1A1A;
-      --noise-col: #C0BDB8; --muted: #9A9896; --accent: #FFD600;
-      --font-type: 'Special Elite', 'Courier New', monospace;
-      --sz-noise: clamp(0.9rem,2.2vw,1.235rem);
-      --sz-body:  clamp(1rem,2.5vw,1.2rem);
-      --sz-def:   clamp(1rem,2.5vw,1.28rem);
-      --sz-logo:  clamp(0.9rem,2vw,1.1rem);
-      --sz-micro: clamp(0.65rem,1.8vw,0.75rem);
-      --sz-ask:   clamp(1.8rem,6vw,2.8rem);
-      --edge: clamp(1rem,4vw,1.5rem);
-      --ease: cubic-bezier(0.16,1,0.3,1);
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    html,body{width:100%;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font-type);overflow:hidden;}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>38ZebraLab — Patterns, Legal Intelligence, Cooking Data</title>
+<meta name="description" content="38ZebraLab — Patterns, Legal Intelligence, Cooking Data. Before it's obvious. Miami · Milano · New York.">
+<meta property="og:title" content="38ZebraLab">
+<meta property="og:description" content="Patterns, Legal Intelligence, Cooking Data. Before it's obvious.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Barlow+Condensed:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F7F6F3;--ink:#1A1A1A;--muted:#9A9896;--words:#C0BDB8;--accent:#FFD600;
+  --font:'Special Elite','Courier New',monospace;
+  --font-c:'Barlow Condensed',sans-serif;
+  --xs:.72rem;--sm:clamp(.88rem,1.2vw,1.05rem);--md:clamp(1.05rem,1.5vw,1.2rem);
+  --lg:clamp(1.15rem,1.7vw,1.35rem);--xl:clamp(1.8rem,3.2vw,2.8rem);
+  --xxl:clamp(2.6rem,5vw,4.2rem);--hero:clamp(3.2rem,7vw,6rem);
+  --logo-sz:clamp(.95rem,1.25vw,1.1rem);
+  --edge:clamp(1.2rem,2.5vw,2rem);--space-s:clamp(.8rem,1.5vw,1.2rem);
+  --space-m:clamp(1.5rem,3vw,2.5rem);--space-l:clamp(3rem,6vw,5rem);
+  --ease:cubic-bezier(.16,1,.3,1);--ease-smooth:cubic-bezier(.4,0,.2,1);
+  --dur-fast:150ms;--dur-base:300ms;--dur-slow:600ms;--dur-reveal:800ms;--dur-cine:1200ms;
+  --content-max:520px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media(pointer:fine){*,*::before,*::after{cursor:none!important}}
+#cur{position:fixed;width:7px;height:7px;background:var(--ink);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .12s var(--ease),background .12s var(--ease);display:none}
+@media(pointer:fine){#cur{display:block}}
+#cur.h{transform:translate(-50%,-50%) scale(2.4);background:var(--accent)}
+#cur.c{transform:translate(-50%,-50%) scale(3);background:var(--accent)}
 
-    /* cursor — desktop only */
-    @media(pointer:fine){
-      *{cursor:none;}
-      .cursor{position:fixed;width:7px;height:7px;background:var(--ink);border-radius:50%;pointer-events:none;z-index:9000;left:var(--cx,-40px);top:var(--cy,-40px);transform:translate(-50%,-50%) scale(1);transition:transform 0.12s ease,background 0.12s ease;}
-      .cursor.clicking{transform:translate(-50%,-50%) scale(2.8);background:var(--accent);}
-    }
-    @media(pointer:coarse){.cursor{display:none;}}
+/* ═══ SINGLE CANVAS — behind everything, always visible ═══ */
+#world-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
 
-    /* dots */
-    .dot{display:inline-block;width:8px;height:8px;background:var(--accent);border-radius:50%;flex-shrink:0;vertical-align:middle;}
-    .dot-sm{display:inline-block;width:6px;height:6px;background:var(--accent);border-radius:50%;flex-shrink:0;vertical-align:middle;}
-    .logo-dot-yellow{color:var(--accent);font-size:1.4em;line-height:0;vertical-align:-0.12em;padding:0 2px;user-select:none;}
+/* ═══ SCREENS — transparent, float above canvas ═══ */
+.screen{position:fixed;inset:0;display:flex;align-items:stretch;opacity:0;pointer-events:none;transition:opacity var(--dur-slow) var(--ease);z-index:5}
+.screen.active{opacity:1;pointer-events:all}
 
-    /* screens */
-    .screen{position:fixed;inset:0;opacity:0;pointer-events:none;transition:opacity 0.5s var(--ease);}
-    .screen.active{opacity:1;pointer-events:all;}
+/* ═══ INTRO OVERLAY ═══ */
+#screen-intro{z-index:10;flex-direction:column;align-items:center;justify-content:center}
+#screen-intro.active{z-index:10}
+#intro-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font);font-size:clamp(2rem,6vw,4.5rem);color:var(--ink);white-space:nowrap;pointer-events:none;z-index:5;display:flex;align-items:baseline}
+#intro-logo .il{display:inline-block;opacity:0;transform:translateY(18px);transition:opacity .5s var(--ease),transform .6s var(--ease)}
+#intro-logo .il.show{opacity:1;transform:translateY(0)}
+#intro-logo .ldy{color:var(--accent);font-size:1.1em}
+#intro-sub{position:absolute;top:calc(50% + clamp(1.8rem,4vw,3.2rem));left:50%;transform:translateX(-50%);font-family:var(--font-c);font-weight:300;font-size:clamp(.7rem,1.4vw,1rem);letter-spacing:.2em;color:var(--muted);opacity:0;transition:opacity var(--dur-cine) ease;white-space:nowrap;pointer-events:none;z-index:5}
+#intro-hint{position:absolute;bottom:calc(var(--edge)*2.5);left:50%;transform:translateX(-50%);font-family:var(--font-c);font-size:var(--xs);font-weight:300;letter-spacing:.2em;color:var(--muted);opacity:0;transition:opacity var(--dur-reveal) ease;white-space:nowrap;display:flex;align-items:center;gap:.6em;pointer-events:none;z-index:20}
+#intro-hint.show{opacity:1}
+.hint-dot{width:5px;height:5px;background:var(--accent);border-radius:50%;animation:hPulse 2s ease-in-out infinite}
+@keyframes hPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(2);opacity:1}}
 
-    .logo-mark{font-family:var(--font-type);font-size:var(--sz-logo);color:var(--ink);display:flex;align-items:baseline;gap:0;}
+/* ═══ NAV ═══ */
+.topnav{position:absolute;top:var(--edge);left:var(--edge);display:flex;align-items:center;gap:.6em;z-index:200}
+.logo-mark{font-family:var(--font);font-size:var(--logo-sz);color:var(--ink);display:inline-flex;align-items:baseline;padding:.25em;user-select:none}
+.ldy{color:var(--accent);font-size:1.55em;line-height:0;vertical-align:-.14em;padding:0 2px}
+.nav-back{font-family:var(--font);font-size:var(--sm);color:var(--words);letter-spacing:.04em;padding:.25em;transition:color var(--dur-fast) ease}
+.nav-back:hover,.nav-back:focus-visible{color:var(--ink)}
+.bot-bar{position:absolute;bottom:var(--edge);left:var(--edge);right:var(--edge);display:flex;justify-content:space-between;align-items:center;font-family:var(--font-c);font-size:var(--xs);letter-spacing:.12em;color:var(--muted);z-index:200}
+.bot-ask{display:flex;align-items:center;gap:.4em;font-family:var(--font-c);font-size:var(--xs);color:var(--muted);letter-spacing:.12em;padding:.25em;transition:color var(--dur-fast) ease}
+.bot-ask:hover,.bot-ask:focus-visible{color:var(--ink)}
+.dot-sm{display:inline-block;width:5px;height:5px;background:var(--accent);border-radius:50%;flex-shrink:0}
 
-    /* GLOBAL NAV */
-    #global-nav{position:fixed;inset:0;pointer-events:none;z-index:500;}
-    #global-nav .gnav-tl{position:absolute;top:var(--edge);left:var(--edge);display:flex;align-items:center;gap:0.6em;pointer-events:all;}
-    #global-nav .gnav-bc{position:absolute;bottom:var(--edge);left:50%;transform:translateX(-50%);pointer-events:all;}
-    #global-nav.hide-back .back-btn{display:none;}
-    #global-nav.hide-ask  .gnav-bc{display:none;}
+/* ═══ TIMELINE ═══ */
+#screen-sections{flex-direction:column;align-items:center;justify-content:center}
+.tl-track{position:absolute;top:50%;left:0;right:0;height:1px;background:var(--words);opacity:.2;z-index:10}
+.tl-pulse-trail{position:absolute;top:50%;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;z-index:11;animation:trailMove 4.5s var(--ease-smooth) infinite}
+@keyframes trailMove{0%{opacity:0;transform:translateX(-100%)}8%{opacity:.15}50%{opacity:.15}92%{opacity:.15}100%{opacity:0;transform:translateX(100%)}}
+.tl-pulse{position:absolute;top:calc(50% - 4px);width:8px;height:8px;border-radius:50%;background:var(--accent);z-index:12;animation:pulseMove 4.5s var(--ease-smooth) infinite;pointer-events:none}
+@keyframes pulseMove{0%{left:-1%;opacity:0}5%{opacity:.9}50%{opacity:.9}95%{opacity:.9}100%{left:101%;opacity:0}}
+.tl-nodes{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-around;padding:0 clamp(2rem,5vw,4rem);z-index:50}
+.tl-node{display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:.5em;transition:transform .4s var(--ease)}
+.tl-node:hover{transform:translateY(-14px)}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--ink);transition:all .35s var(--ease);position:relative;animation:nodeBreathe 3s ease-in-out infinite}
+@keyframes nodeBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.tl-dot::after{content:'';position:absolute;inset:-7px;border-radius:50%;border:1px solid transparent;transition:all .35s var(--ease)}
+.tl-node:hover .tl-dot{background:var(--accent);transform:scale(1.7);animation:none}
+.tl-node:hover .tl-dot::after{border-color:var(--accent);opacity:.3}
+.tl-dot.flash{animation:nodeFlash .4s ease}
+@keyframes nodeFlash{0%{box-shadow:0 0 0 0 rgba(255,214,0,.6)}50%{box-shadow:0 0 0 12px rgba(255,214,0,0)}100%{box-shadow:0 0 0 0 rgba(255,214,0,0)}}
+.tl-txt{font-family:var(--font);font-size:var(--sm);color:var(--muted);transition:color .3s var(--ease);white-space:nowrap}
+.tl-node:hover .tl-txt{color:var(--ink)}
+.tl-node-ask .tl-dot{background:var(--accent)}
+.tl-node-ask .tl-txt{color:var(--accent)}
+.tl-node-ask:hover .tl-dot{background:var(--ink)}
+.tl-node-ask:hover .tl-txt{color:var(--ink)}
 
-    .back-btn{font-family:var(--font-type);font-size:var(--sz-noise);color:var(--muted);letter-spacing:0.04em;transition:color 0.15s;user-select:none;background:none;border:none;padding:0.5rem 0;min-height:44px;display:flex;align-items:center;}
-    .back-btn:hover{color:var(--ink);}
+/* ═══ CONTENT ═══ */
+.content-wrap{position:relative;z-index:50;flex:1;display:flex;align-items:center;justify-content:center;padding:var(--space-l) var(--space-m)}
+.content-inner{max-width:var(--content-max);width:100%;opacity:0;transform:translateY(24px);transition:opacity var(--dur-cine) var(--ease),transform var(--dur-cine) var(--ease);border-left:1px solid var(--words);padding-left:var(--space-m);border-image:linear-gradient(to bottom,transparent,var(--words) 15%,var(--words) 85%,transparent) 1}
+.screen.active .content-inner{opacity:1;transform:translateY(0)}
+.reveal-word{display:inline-block;opacity:0;transform:translateY(12px);transition:opacity .45s var(--ease),transform .55s var(--ease)}
+.reveal-word.show{opacity:1;transform:translateY(0)}
+.who-card{margin-bottom:var(--space-m)}.who-card:last-child{margin-bottom:0}
+.who-name{font-size:var(--xl);font-weight:normal;letter-spacing:-.01em;margin-bottom:.15em}
+.who-role{font-family:var(--font-c);font-size:var(--xs);letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:var(--space-s)}
+.who-bio{font-size:var(--lg);line-height:1.85}
+.who-divider{border:none;border-top:1px solid var(--words);margin:var(--space-m) 0}
+.what-grid{position:relative;z-index:50;display:flex;flex-direction:column;gap:.2rem;
+  width:100%;max-width:var(--content-max);margin:auto;padding:var(--space-xl) var(--space-m) var(--space-l);
+  opacity:0;transform:translateY(40px);transition:opacity var(--dur-cine) var(--ease),transform var(--dur-cine) var(--ease)}
+#screen-what.active .what-grid{opacity:1;transform:translateY(0);transition-delay:.3s}
+.what-link{font-family:var(--font);font-size:var(--xl);color:var(--ink);letter-spacing:-.01em;padding:.2em .3em;text-align:left;transition:color var(--dur-base) var(--ease),transform var(--dur-base) var(--ease)}
+.what-link:hover,.what-link:focus-visible{color:var(--accent);transform:translateX(8px)}
+.entry-term{font-size:var(--xl);letter-spacing:-.01em;display:inline}
+.entry-pos{font-size:var(--md);color:var(--muted);font-style:italic;margin-left:.4em}
+.entry-def{font-size:var(--lg);line-height:1.85;margin-top:var(--space-s)}
+.entry-body{font-size:var(--lg);line-height:1.85;margin-top:var(--space-m);padding-top:var(--space-m);border-top:1px solid var(--words)}
+.filed-grid{display:flex;flex-direction:column;gap:var(--space-m);margin-top:var(--space-m)}
+.filed-row{display:grid;grid-template-columns:2.8em 1fr;gap:.3rem 1rem;padding-bottom:var(--space-m);border-bottom:1px solid var(--words)}
+.filed-row:last-child{border-bottom:none;padding-bottom:0}
+.filed-n{font-family:var(--font-c);font-size:var(--xs);color:var(--muted);grid-row:1/3;padding-top:.3em;letter-spacing:.1em}
+.filed-c{font-size:var(--lg)}.filed-m{font-family:var(--font-c);font-size:var(--xs);color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+.filed-desc{grid-column:2;font-size:var(--md);color:var(--muted);margin-top:.3rem;font-style:italic}
+.ask-title{font-size:var(--hero);letter-spacing:-.02em;margin-bottom:var(--space-m);display:flex;align-items:baseline;gap:.2em}
+.ask-email{width:100%;background:transparent;border:none;border-bottom:2px solid var(--ink);font-family:var(--font);font-size:var(--lg);color:var(--ink);padding:.6rem 0;outline:none;transition:border-color var(--dur-base) ease}
+.ask-email::placeholder{color:var(--words)}.ask-email:focus{border-bottom-color:var(--accent)}
+.ask-send{display:block;margin-top:var(--space-s);font-family:var(--font-c);font-size:var(--sm);letter-spacing:.15em;color:var(--muted);padding:.4em 0;transition:color var(--dur-fast) ease}
+.ask-send:hover,.ask-send:focus-visible{color:var(--ink)}
+#ask-confirm{margin-top:var(--space-s);font-family:var(--font-c);font-size:var(--xs);letter-spacing:.1em;color:var(--muted);opacity:0;transition:opacity .5s}
 
-    .ask-btn{display:flex;align-items:center;gap:0.35em;background:none;border:none;font-family:var(--font-type);font-size:var(--sz-micro);color:var(--muted);letter-spacing:0.1em;transition:color 0.2s;padding:0.5rem 1rem;min-height:44px;}
-    .ask-btn:hover{color:var(--ink);}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:8000;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E")}
 
-    /* footer */
-    .sfooter{position:absolute;bottom:var(--edge);left:var(--edge);right:var(--edge);display:flex;justify-content:space-between;align-items:center;font-size:var(--sz-micro);letter-spacing:0.1em;color:var(--muted);z-index:10;}
-
-    /* noise */
-    .noise-block{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;word-break:break-word;}
-    .n-hi{color:var(--ink);font-weight:bold;}
-    .n-label{color:var(--ink);font-weight:bold;transition:color 0.15s;white-space:nowrap;}
-    .n-label:hover,.n-label:active{color:var(--accent);}
-    .n-logo{font-weight:bold;color:var(--ink);white-space:nowrap;transition:color 0.15s;}
-    .n-logo:hover,.n-logo:active{color:var(--accent);}
-
-    /* INTRO */
-    #screen-intro{position:fixed;inset:0;overflow:hidden;}
-    .intro-noise-col{position:absolute;inset:0;padding:10vh clamp(1rem,4vw,2rem);overflow:hidden;}
-    .intro-noise-col .noise-block{line-height:2;}
-
-    /* WHO */
-    #screen-who{display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;}
-    .who-inner{max-width:560px;width:100%;padding:5rem clamp(1rem,5vw,2rem) 5rem;}
-    .who-noise-mid{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;margin:1.6rem 0;}
-    .who-term{font-size:clamp(0.9rem,2.2vw,1.1rem);font-weight:bold;}
-    .who-pos{font-style:italic;color:var(--muted);font-size:var(--sz-body);margin-left:0.5em;}
-    .who-def{font-size:var(--sz-def);line-height:1.9;margin-top:0.55rem;}
-    .who-divider{border:none;border-top:1px solid var(--noise-col);margin:2rem 0;}
-    .who-name{font-size:var(--sz-body);font-weight:bold;margin-bottom:0.3rem;}
-    .who-role{font-size:var(--sz-noise);color:var(--muted);letter-spacing:0.06em;margin-bottom:0.7rem;}
-    .who-bio{font-size:var(--sz-def);line-height:1.9;}
-
-    /* WHAT */
-    #screen-what{display:flex;align-items:center;justify-content:center;}
-    .what-band{width:100%;height:100%;display:flex;align-items:stretch;}
-    .what-side{flex:1;background:var(--bg);}
-    .what-noise-col{flex:0 0 min(33.333%,340px);min-height:100%;padding:3vh clamp(1rem,3vw,1.8rem);overflow:hidden;}
-    @media(max-width:600px){
-      .what-side{display:none;}
-      .what-noise-col{flex:1;min-width:0;}
-    }
-
-    /* ENCYCLOPEDIA */
-    #screen-patterns,#screen-legalintel,#screen-cookingdata,#screen-obvious{display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;}
-    .enc-inner{max-width:560px;width:100%;padding:5rem clamp(1rem,5vw,2rem) 5rem;}
-    .enc-noise{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;margin-bottom:1.8rem;}
-    .enc-noise-bot{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;margin-top:1.6rem;}
-    .enc-term{font-size:clamp(0.9rem,2.2vw,1.1rem);font-weight:bold;}
-    .enc-pos{font-style:italic;color:var(--muted);font-size:var(--sz-body);margin-left:0.5em;}
-    .enc-def{font-size:var(--sz-def);line-height:1.9;margin-top:0.55rem;}
-
-    /* ASK */
-    #screen-ask{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;}
-    .ask-heading{display:flex;align-items:center;gap:0.5em;font-size:var(--sz-ask);font-weight:bold;}
-    .ask-form{width:100%;max-width:320px;padding:0 clamp(1rem,5vw,1.5rem);opacity:0;transform:translateY(12px);transition:opacity 0.55s var(--ease),transform 0.55s var(--ease);}
-    .ask-form.show{opacity:1;transform:translateY(0);}
-    .ask-field{width:100%;background:transparent;border:none;border-bottom:1px solid var(--ink);font-family:var(--font-type);font-size:var(--sz-body);color:var(--ink);padding:0.6rem 0;outline:none;-webkit-appearance:none;border-radius:0;}
-    .ask-field::placeholder{color:var(--noise-col);}
-    .ask-send{display:block;margin-top:1.2rem;background:none;border:none;font-family:var(--font-type);font-size:var(--sz-micro);letter-spacing:0.14em;color:var(--muted);padding:0.5rem 0;min-height:44px;transition:color 0.2s;}
-    .ask-send:hover{color:var(--ink);}
-    @keyframes blink-ask{0%,100%{opacity:1}50%{opacity:0}}
-    .ask-heading.blinking{animation:blink-ask 0.7s ease-in-out 3;}
-
-    /* WHY / WHERE */
-    #screen-why,#screen-where{display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;}
-    .sec-inner{max-width:560px;width:100%;padding:5rem clamp(1rem,5vw,2rem) 5rem;}
-    .sec-noise{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;margin-bottom:1.8rem;}
-    .sec-noise-mid{font-size:var(--sz-noise);color:var(--noise-col);line-height:1.9;margin:1.6rem 0;}
-    .sec-term{font-size:clamp(0.9rem,2.2vw,1.1rem);font-weight:bold;}
-    .sec-pos{font-style:italic;color:var(--muted);font-size:var(--sz-body);margin-left:0.5em;}
-    .sec-def{font-size:var(--sz-def);line-height:1.9;margin-top:0.55rem;}
-    .sec-body{font-size:var(--sz-def);line-height:1.9;}
-
-    /* SCREENSAVER */
-    #ee-overlay{position:fixed;inset:0;z-index:9998;background:#000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.5s;overflow:hidden;}
-    #ee-overlay.show{opacity:1;pointer-events:all;}
-    #ee-hacker{position:absolute;inset:0;padding:2.5vh 2.5vw;font-family:'Barlow Condensed',monospace;font-size:clamp(0.55rem,1.5vw,0.9rem);color:#2a2a2a;line-height:1.6;overflow:hidden;white-space:pre-wrap;word-break:break-all;}
-    #ee-logo{position:relative;z-index:2;font-family:'Special Elite',serif;font-size:clamp(1.8rem,7vw,5rem);color:#fff;letter-spacing:0.03em;line-height:1;text-align:center;}
-    #ee-overlay.yellow{background:#FFD600;}
-    #ee-overlay.yellow #ee-logo{color:#000;}
-    #ee-overlay.yellow #ee-hacker{color:#c8a800;}
-    .ee-lchar{opacity:0;display:inline;}.ee-lchar.on{opacity:1;}
-    .ee-dot{color:#FFD600;}
-    #ee-overlay.yellow .ee-dot{color:#000;}
-
-    /* SECTIONS */
-    #screen-sections{overflow:hidden;display:flex;align-items:stretch;height:100%;}
-    .sections-left{flex:1;}
-    .sections-noise-col{flex:0 0 min(33vw,360px);height:100%;padding:3vh clamp(0.8rem,2vw,1.5rem);overflow:hidden;position:relative;}
-    @media(max-width:600px){.sections-left{display:none;}.sections-noise-col{flex:1;min-width:0;}}
-    .sections-noise-col .noise-block{position:absolute;top:0;left:clamp(0.8rem,2vw,1.5rem);right:clamp(0.8rem,2vw,1.5rem);line-height:1.85;font-size:var(--sz-noise);color:var(--noise-col);z-index:0;}
-
-    /* BB */
-    #bb-overlay{position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.6s;overflow:hidden;}
-    #bb-overlay.show{opacity:1;pointer-events:all;}
-    #bb-light{position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:0;height:0;border-left:0px solid transparent;border-right:0px solid transparent;border-top:0px solid rgba(255,255,255,0);transition:none;}
-    #bb-overlay.lit #bb-light{border-left:60vw solid transparent;border-right:60vw solid transparent;border-top:130vh solid rgba(255,255,255,0.07);transition:border-top-width 1.2s ease-out,border-left-width 1.2s ease-out,border-right-width 1.2s ease-out;}
-    #bb-text{position:relative;z-index:2;font-family:'Special Elite',serif;font-size:clamp(1.2rem,4vw,3rem);color:#fff;text-align:center;letter-spacing:0.06em;line-height:1.6;opacity:0;transition:opacity 0.8s;}
-    #bb-overlay.textshow #bb-text{opacity:1;}
-    .bb-char{opacity:0;display:inline;}.bb-char.on{opacity:1;}
-
-    ::-webkit-scrollbar{width:2px;}
-    ::-webkit-scrollbar-track{background:transparent;}
-    ::-webkit-scrollbar-thumb{background:var(--noise-col);}
-  </style>
+@media(max-width:768px){:root{--content-max:100%}.content-wrap{padding:5rem var(--edge) var(--space-l)}.what-link{font-size:var(--xl)}.tl-nodes{padding:0 1rem}.tl-txt{font-size:var(--xs)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.1ms!important}.content-inner,.what-grid{opacity:1!important;transform:none!important}}
+</style>
 </head>
 <body>
+<div id="cur" aria-hidden="true"></div>
+<!-- SINGLE Three.js CANVAS — always visible, always rendering -->
+<canvas id="world-canvas"></canvas>
 
-<div class="cursor"></div>
-
-<!-- GLOBAL NAV -->
-<div id="global-nav" class="hide-back">
-  <div class="gnav-tl">
-    <div class="logo-mark" id="nav-logo">38ZebraLab<span class="logo-dot-yellow">.</span></div>
-    <button class="back-btn" id="nav-back">← back</button>
-  </div>
-  <div class="gnav-bc">
-    <button class="ask-btn" id="nav-ask-bc"><span class="dot-sm"></span><span>Ask</span></button>
-  </div>
+<!-- ══ INTRO ══ -->
+<div class="screen active" id="screen-intro" tabindex="0" role="button" aria-label="Enter site">
+  <div id="intro-logo"><span class="il">3</span><span class="il">8</span><span class="il">Z</span><span class="il">e</span><span class="il">b</span><span class="il">r</span><span class="il">a</span><span class="il">L</span><span class="il">a</span><span class="il">b</span><span class="il ldy">.</span></div>
+  <div id="intro-sub">Miami · Milano · New York</div>
+  <div id="intro-hint"><span class="hint-dot"></span><span>TAP ANYWHERE TO ENTER</span></div>
 </div>
 
-<div id="ee-overlay"><div id="ee-hacker"></div><div id="ee-logo"></div></div>
-<div id="bb-overlay"><div id="bb-light"></div><div id="bb-text"></div></div>
-
-<!-- INTRO -->
-<div class="screen active" id="screen-intro">
-  <div class="intro-noise-col"><div class="noise-block" id="intro-noise"></div></div>
-</div>
-
-<!-- SECTIONS -->
+<!-- ══ SECTIONS ══ -->
 <div class="screen" id="screen-sections">
-  <div class="sections-left"></div>
-  <div class="sections-noise-col" id="sections-col"></div>
-  <div class="sfooter"><span>MIAMI · MILANO · NEW YORK</span><span></span><span>EST. 2026</span></div>
+  <div class="topnav"><button class="logo-mark" data-go="intro" aria-label="Back to intro">38ZebraLab<span class="ldy">.</span></button></div>
+  <div class="tl-track"></div>
+  <div class="tl-pulse-trail"></div>
+  <div class="tl-pulse"></div>
+  <div class="tl-nodes">
+    <button class="tl-node" data-go="who"><span class="tl-dot"></span><span class="tl-txt">Who</span></button>
+    <button class="tl-node" data-go="what"><span class="tl-dot"></span><span class="tl-txt">What</span></button>
+    <button class="tl-node" data-go="why"><span class="tl-dot"></span><span class="tl-txt">Why</span></button>
+    <button class="tl-node" data-go="where"><span class="tl-dot"></span><span class="tl-txt">Where</span></button>
+    <button class="tl-node" data-go="method"><span class="tl-dot"></span><span class="tl-txt">Method</span></button>
+    <button class="tl-node" data-go="ai"><span class="tl-dot"></span><span class="tl-txt">AI</span></button>
+    <button class="tl-node" data-go="filed"><span class="tl-dot"></span><span class="tl-txt">Filed</span></button>
+    <button class="tl-node tl-node-ask" data-go="ask"><span class="tl-dot"></span><span class="tl-txt">Ask</span></button>
+  </div>
+  <div class="bot-bar"><span>MIAMI · MILANO · NEW YORK</span><span></span><span>EST. 2026</span></div>
 </div>
 
-<!-- WHO -->
+<!-- ══ WHO ══ -->
 <div class="screen" id="screen-who">
-  <div class="who-inner">
-    <p class="who-name">Tommaso</p>
-    <p class="who-role">CO-FOUNDER · DATA</p>
-    <p class="who-bio">Columbia MS, Sports Management. Specializes in sports data — finding the signal inside performance numbers that teams and organizations haven't learned to read yet. Builds systems that see what the eye misses.</p>
+  <div class="topnav"><button class="logo-mark" data-go="sections">38ZebraLab<span class="ldy">.</span></button><button class="nav-back" data-go="sections">← back</button></div>
+  <div class="content-wrap"><div class="content-inner">
+    <div class="who-card"><p class="who-name">Data</p><p class="who-role">Tommaso — Co-Founder</p><p class="who-bio">Columbia MS. Sports data in New York — finding the signal inside performance numbers that organizations hadn't learned to read yet. The gap between what data says and what people believe exists everywhere.</p></div>
     <hr class="who-divider">
-    <p class="who-name">Giorgio</p>
-    <p class="who-role">CO-FOUNDER · LEGAL · STRATEGY</p>
-    <p class="who-bio">Thirty years at the top of Italian litigation. The kind of work that ends at the Supreme Court. Closing tables in Miami on weekends.</p>
-    <hr class="who-divider">
-    <div class="who-noise-mid" id="who-noise-top"></div>
-    <div><span class="who-term">Pattern Architects</span><span class="who-pos">n. phr.</span></div>
-    <p class="who-def">We work with few. The right ones. Companies and individuals operating at the intersection of ambition and complexity — who understand that the first-mover advantage belongs to those who ask better questions, not louder ones.</p>
-    <div class="who-noise-mid" id="who-noise-mid"></div>
-  </div>
-  <div class="sfooter"><span>01 — WHO</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+    <div class="who-card"><p class="who-name">Legal · Strategy</p><p class="who-role">Giorgio — Co-Founder</p><p class="who-bio">Lawyer in Italy. Higher courts. The cases that don't settle — the ones where someone's entire structure is on the line. He learned to find the question no one was asking. The one that makes everything else irrelevant.</p></div>
+  </div></div>
+  <div class="bot-bar"><span>01 — WHO</span><button class="bot-ask" data-go="ask"><span class="dot-sm"></span>Ask</button><span>38ZEBRALAB · EST. 2026</span></div>
 </div>
 
-<!-- WHAT -->
+<!-- ══ WHAT ══ -->
 <div class="screen" id="screen-what">
-  <div class="what-band">
-    <div class="what-side"></div>
-    <div class="what-noise-col"><div class="noise-block" id="what-noise"></div></div>
-    <div class="what-side"></div>
-  </div>
-  <div class="sfooter"><span>02 — WHAT</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+  <div class="topnav"><button class="logo-mark" data-go="sections">38ZebraLab<span class="ldy">.</span></button><button class="nav-back" data-go="sections">← back</button></div>
+  <div class="content-wrap"><div class="content-inner" id="prose-what"></div></div>
+  <div class="bot-bar"><span>02 — WHAT</span><button class="bot-ask" data-go="ask"><span class="dot-sm"></span>Ask</button><span>38ZEBRALAB · EST. 2026</span></div>
 </div>
-
-<!-- ENCYCLOPEDIA -->
-<div class="screen" id="screen-patterns">
-  <div class="enc-inner">
-    <div class="enc-noise" id="enc-noise-patterns"></div>
-    <div><span class="enc-term">Patterns</span><span class="enc-pos">n. pl.</span></div>
-    <p class="enc-def">The recurring geometry of events that most observers mistake for coincidence. A pattern is not a trend — it is the structural logic beneath behavior, data, and decision. The first thing we look for. The last thing most people see. Recognizing a pattern before it becomes obvious is the only sustainable form of competitive advantage.</p>
-    <div class="enc-noise-bot" id="enc-noise-patterns-bot"></div>
-  </div>
-  <div class="sfooter"><span>WHAT — PATTERNS</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
-</div>
-
-<div class="screen" id="screen-legalintel">
-  <div class="enc-inner">
-    <div class="enc-noise" id="enc-noise-legalintel"></div>
-    <div><span class="enc-term">Legal Intelligence</span><span class="enc-pos">n. phr.</span></div>
-    <p class="enc-def">The application of legal structure as a strategic instrument — not a constraint. The capacity to navigate regulatory, contractual, and jurisdictional complexity not to avoid risk, but to architect advantage. Where most see limits, legal intelligence finds the design space.</p>
-    <div class="enc-noise-bot" id="enc-noise-legalintel-bot"></div>
-  </div>
-  <div class="sfooter"><span>WHAT — LEGAL INTELLIGENCE</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
-</div>
-
-<div class="screen" id="screen-cookingdata">
-  <div class="enc-inner">
-    <div class="enc-noise" id="enc-noise-cookingdata"></div>
-    <div><span class="enc-term">Cooking Data</span><span class="enc-pos">n. phr.</span></div>
-    <p class="enc-def">The art of extracting and combining data in unconventional ways to obtain something extraordinary. A discipline that operates where analysis ends and intuition begins — transforming raw, overlooked, or seemingly unrelated information into products, decisions, and advantages that conventional methods would never have produced.</p>
-    <div class="enc-noise-bot" id="enc-noise-cookingdata-bot"></div>
-  </div>
-  <div class="sfooter"><span>WHAT — COOKING DATA</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
-</div>
-
-<div class="screen" id="screen-obvious">
-  <div class="enc-inner">
-    <div class="enc-noise" id="enc-noise-obvious"></div>
-    <div><span class="enc-term">Before It's Obvious</span><span class="enc-pos">adv. phr.</span></div>
-    <p class="enc-def">The only moment that produces non-consensus returns. After something becomes obvious, the advantage is already distributed. The work we do exists almost entirely in the interval between signal emergence and common recognition — which is, by definition, the interval that cannot be systematized.</p>
-    <div class="enc-noise-bot" id="enc-noise-obvious-bot"></div>
-  </div>
-  <div class="sfooter"><span>WHAT — BEFORE IT'S OBVIOUS</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
-</div>
-
-<!-- WHY -->
 <div class="screen" id="screen-why">
-  <div class="sec-inner">
-    <div class="sec-noise" id="why-noise-top"></div>
-    <div><span class="sec-term">Asymmetric Leverage</span><span class="sec-pos">n. phr.</span></div>
-    <p class="sec-def">Most organizations apply uniform force to every problem. This is efficient and consistently wrong. A single precise question — asked before anyone else knows to ask it — produces results that no volume of effort applied afterward can replicate. We exist for that question. The one that makes the solution obvious in hindsight and invisible in advance. The work is finding it before hindsight arrives.</p>
-    <div class="sec-noise-mid" id="why-noise-mid"></div>
-    <p class="sec-body">Because complexity is not the problem. The absence of a sharper question is.</p>
-  </div>
-  <div class="sfooter"><span>03 — WHY</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+  <div class="topnav"><button class="logo-mark" data-go="sections">38ZebraLab<span class="ldy">.</span></button><button class="nav-back" data-go="sections">← back</button></div>
+  <div class="content-wrap"><div class="content-inner" id="prose-why"></div></div>
+  <div class="bot-bar"><span>03 — WHY</span><button class="bot-ask" data-go="ask"><span class="dot-sm"></span>Ask</button><span>38ZEBRALAB · EST. 2026</span></div>
 </div>
-
-<!-- WHERE -->
 <div class="screen" id="screen-where">
-  <div class="sec-inner">
-    <div class="sec-noise" id="where-noise-top"></div>
-    <div><span class="sec-term">Operational Radius</span><span class="sec-pos">n. phr.</span></div>
-    <p class="sec-def">The condition in which presence is not a location — it is a decision. We do not open offices where markets are comfortable. We position where the complexity is.</p>
-    <div class="sec-noise-mid" id="where-noise-mid"></div>
-    <p class="sec-body">Built in Milano. Engineered in New York. Based in Miami. Dispatched everywhere else.<br><br>Where they need. Where they hide.</p>
-  </div>
-  <div class="sfooter"><span>04 — WHERE</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+  <div class="topnav"><button class="logo-mark" data-go="sections">38ZebraLab<span class="ldy">.</span></button><button class="nav-back" data-go="sections">← back</button></div>
+  <div class="content-wrap"><div class="content-inner" id="prose-where"></div></div>
+  <div class="bot-bar"><span>04 — WHERE</span><button class="bot-ask" data-go="ask"><span class="dot-sm"></span>Ask</button><span>38ZEBRALAB · EST. 2026</span></div>
 </div>
-
-<!-- ASK -->
+<div class="screen" id="screen-method">
+  <div class="topnav"><button class="logo-mark" data-go="sections">38ZebraLab<span class="ldy">.</span></button><button class="nav-back" data-go="sections">← back</button></div>
+  <div class="content-wrap"><div class="content-inner" id="prose-method"></div></div>
+  <div class="bot-bar"><span>05 — METHOD</span><button class="bot-ask" data-go="ask"><span class="dot-sm"></span>Ask</button><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
+<div class="screen" id="screen-ai">
+  <div class="topnav"><button class="logo-mark" data-go="sections">38ZebraLab<span class="ldy">.</span></button><button class="nav-back" data-go="sections">← back</button></div>
+  <div class="content-wrap"><div class="content-inner" id="prose-ai"></div></div>
+  <div class="bot-bar"><span>06 — AI</span><button class="bot-ask" data-go="ask"><span class="dot-sm"></span>Ask</button><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
+<div class="screen" id="screen-filed">
+  <div class="topnav"><button class="logo-mark" data-go="sections">38ZebraLab<span class="ldy">.</span></button><button class="nav-back" data-go="sections">← back</button></div>
+  <div class="content-wrap"><div class="content-inner" id="prose-filed"></div></div>
+  <div class="bot-bar"><span>07 — FILED</span><button class="bot-ask" data-go="ask"><span class="dot-sm"></span>Ask</button><span>38ZEBRALAB · EST. 2026</span></div>
+</div>
 <div class="screen" id="screen-ask">
-  <div class="ask-heading" id="ask-heading"><span class="dot"></span><span>Ask</span></div>
-  <div class="ask-form" id="ask-form">
-    <input type="email" class="ask-field" id="ask-email" placeholder="your@email.com" autocomplete="email">
-    <button class="ask-send" id="ask-send-btn">→ send</button>
-    <p id="ask-confirm" style="margin-top:1rem;font-size:var(--sz-micro);letter-spacing:0.1em;color:var(--muted);opacity:0;transition:opacity 0.5s;">message sent.</p>
-  </div>
-  <div class="sfooter"><span>ASK</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
+  <div class="topnav"><button class="logo-mark" data-go="sections">38ZebraLab<span class="ldy">.</span></button><button class="nav-back" data-go="sections">← back</button></div>
+  <div class="content-wrap"><div class="content-inner" style="max-width:400px">
+    <div class="ask-title">Ask<span class="ldy" style="font-size:.6em">.</span></div>
+    <input type="email" class="ask-email" id="ask-email" placeholder="your@email.com" autocomplete="email" aria-label="Your email">
+    <button class="ask-send" id="ask-send-btn">→ SEND</button>
+    <p id="ask-confirm" aria-live="polite"></p>
+  </div></div>
+  <div class="bot-bar"><span>MIAMI · MILANO · NEW YORK</span><span></span><span>38ZEBRALAB · EST. 2026</span></div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){
 'use strict';
+var NP=['clause','nexus','leverage','equity','exposure','jurisdiction','arbitrage','brief','ruling','yield','spread','delta','alpha','settlement','hedge','proxy','threshold','covenant','warrant','disclosure','collateral','indemnity','waiver','closing','signal','inference','regime','velocity','momentum','trigger','outlier','anomaly','cluster','weight','vector','latency','corpus','pattern','edge','ratio','variance','drift','baseline','algorithm','model','training','deployment','token','embedding','pipeline','benchmark','prompt','context','structure','asymmetric','timing','intent','clarity','frame','protocol','layer','boundary','surface','depth','sequence','filter','node','matrix','tension','friction','field','density','margin','frequency','amplitude','system','proof','scope','output','input','grid','code','data','blueprint','canvas','prototype','iteration','runway','thesis','capital','founder','board','valuation','scenario','horizon','conviction','narrative','position','table','room','decision','pressure','window','early','design','brand','creative','method','signal','craft','frame','lever','edge','map','form','draft','loop','pulse','trace','index','pivot','grain','channel','void'];
+function rw(){return NP[Math.floor(Math.random()*NP.length)];}
 
-/* ── NAV ROUTING ── */
-var BACK_MAP={
-  'who':'sections','what':'sections','why':'sections','where':'sections','ask':'sections',
-  'patterns':'what','legalintel':'what','cookingdata':'what','obvious':'what','sections':'intro'
+/* ═══ CONTENT ═══ */
+var DATA={
+  why:{term:'Asymmetric Leverage',pos:'n. phr.',def:"Every complex situation has one question that makes the solution obvious in hindsight and invisible in advance. We exist for that question.",body:"Complexity is not the problem. The absence of a sharper question is."},
+  where:{term:'Operational Radius',pos:'n. phr.',def:"Giorgio \u2014 Milano. Italian courts, from inside the room. Tommaso \u2014 New York. Columbia. Technical pressure. Miami \u2014 where we work. The world\u2019s new table. We got here early.",body:"Three cities. One method. No overlap."},
+  method:{term:'meth\u00b7od',pos:'n.',def:"We don\u2019t separate analysis from execution. The brief, the structure, and the output are built in the same motion.",body:"Problems are solved at the level of structure, not surface. Every deliverable explains itself without us in the room."},
+  ai:{term:'AI',pos:'n., abbr.',def:"AI is a multiplier, not a replacement. We build the engine, integrate it into your workflow, and hand you the controls. The output is yours. The method is ours."}
 };
-var NO_BACK={'intro':true};
-var NO_ASK={'intro':true,'ask':true};
+function buildProse(key){var d=DATA[key];if(!d)return;var el=document.getElementById('prose-'+key);if(!el)return;var h='<div><span class="entry-term">'+d.term+'</span><span class="entry-pos">'+d.pos+'</span></div><p class="entry-def">'+d.def+'</p>';if(d.body)h+='<p class="entry-body">'+d.body.replace(/\n\n/g,'</p><p class="entry-body" style="border:none;padding-top:0;margin-top:var(--space-s);">')+'</p>';el.innerHTML=h;}
+function buildWhat(){
+  var el=document.getElementById('prose-what');if(!el)return;
+  el.innerHTML='<div style="margin-bottom:var(--space-m)"><span class="entry-term">Patterns</span><span class="entry-pos">n. pl.</span><p class="entry-def">The interval between seeing something and being able to prove it. That\u2019s where we work.</p></div>'
+  +'<div style="margin-bottom:var(--space-m)"><span class="entry-term">Legal Intelligence</span><span class="entry-pos">n. phr.</span><p class="entry-def">Not what you cannot do. What the structure of this jurisdiction makes possible that your competitors haven\u2019t noticed yet.</p></div>'
+  +'<div style="margin-bottom:var(--space-m)"><span class="entry-term">Cooking Data</span><span class="entry-pos">n. phr.</span><p class="entry-def">Everyone has the same data. The advantage was always in the combination no one else tried.</p></div>'
+  +'<div><span class="entry-term">Before It\u2019s Obvious</span><span class="entry-pos">adv. phr.</span><p class="entry-def">After it\u2019s obvious, the money is already made. You know why you\u2019re here.</p></div>';
+}
+function buildFiled(){var el=document.getElementById('prose-filed');if(!el)return;el.innerHTML='<div><span class="entry-term">filed</span><span class="entry-pos">v., past part.</span></div><p class="entry-def">Selected work. Delivered, archived, closed.</p><div class="filed-grid"><div class="filed-row"><span class="filed-n">001</span><span class="filed-c">galbiati.law</span><span class="filed-m">Legal \u00b7 Milano \u00b7 2026</span><span class="filed-desc">Custom AI legal intelligence engine. Brand identity. Web design.</span></div><div class="filed-row"><span class="filed-n">002</span><span class="filed-c">Milano Commercialisti</span><span class="filed-m">Accounting \u00b7 Milano \u00b7 2026</span><span class="filed-desc">Custom AI engine. Brand identity. Web design. Italy\u2013USA cross-border positioning.</span></div></div>';}
+Object.keys(DATA).forEach(buildProse);buildWhat();buildFiled();
 
-var gnav    = document.getElementById('global-nav');
-var navLogo = document.getElementById('nav-logo');
-var navBack = document.getElementById('nav-back');
-var navAsk  = document.getElementById('nav-ask-bc');
+/* ═══ CURSOR ═══ */
+var cur=document.getElementById('cur'),isFine=window.matchMedia('(pointer:fine)').matches;
+if(isFine){document.addEventListener('mousemove',function(e){cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px'});document.addEventListener('mousedown',function(){cur.classList.add('c')});document.addEventListener('mouseup',function(){cur.classList.remove('c')})}
+function applyHovers(){if(!isFine)return;document.querySelectorAll('button,.ask-email').forEach(function(el){if(el._hb)return;el._hb=1;el.addEventListener('mouseenter',function(){cur.classList.add('h')});el.addEventListener('mouseleave',function(){cur.classList.remove('h')})})}
+applyHovers();
 
-navLogo.addEventListener('click',function(){ showScreen(current==='intro'?'intro':'sections'); });
-navBack.addEventListener('click',function(){ showScreen(BACK_MAP[current]||'sections'); });
-navAsk.addEventListener('click', function(){ showScreen('ask'); });
+/* ═══════════════════════════════════════════════════════════
+   ONE Three.js SCENE — ONE RENDERER — ONE WEBGL CONTEXT
+   Intro animation + background swarm use the SAME renderer.
+   After intro completes, particles transition to swarm mode.
+═══════════════════════════════════════════════════════════ */
+var MX=0,MY=0;
+document.addEventListener('mousemove',function(e){MX=(e.clientX/innerWidth-.5)*2;MY=(e.clientY/innerHeight-.5)*2});
 
-function updateNav(name){
-  gnav.classList.toggle('hide-back', !!NO_BACK[name]);
-  gnav.classList.toggle('hide-ask',  !!NO_ASK[name]);
+var scene=new THREE.Scene();
+scene.background=new THREE.Color(0xF7F6F3);
+var camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,1,2000);
+camera.position.z=740;
+var renderer=new THREE.WebGLRenderer({canvas:document.getElementById('world-canvas'),antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+
+var group=new THREE.Group();scene.add(group);
+var SPHERE=400,COUNT=350;
+
+/* Mood presets — speed, sphere tightness, alpha, wobble */
+var MOOD={
+  intro:     {speed:1,  sph:1,   aMin:.35,aMax:.8,  wobble:1,   autoRotY:0,   type:'globe'},
+  orbit:     {speed:.5, sph:.65, aMin:.4, aMax:.85, wobble:.3,  autoRotY:.006,type:'globe'},
+  sections:  {speed:.8, sph:1.2, aMin:.3, aMax:.6,  wobble:.8,  autoRotY:.002,type:'globe'},
+  who:       {speed:.4, sph:1.1, aMin:.25,aMax:.5,  wobble:.5,  autoRotY:.001,type:'drift'},
+  what:      {speed:.7, sph:1.2, aMin:.3, aMax:.55, wobble:1,   autoRotY:.002,type:'drift'},
+  why:       {speed:.3, sph:1.0, aMin:.2, aMax:.45, wobble:.4,  autoRotY:.001,type:'globe'},
+  where:     {speed:.6, sph:1.1, aMin:.25,aMax:.5,  wobble:.7,  autoRotY:.002,type:'drift'},
+  method:    {speed:.25,sph:.9,  aMin:.2, aMax:.4,  wobble:.3,  autoRotY:.0008,type:'globe'},
+  ai:        {speed:1.2,sph:1.2, aMin:.35,aMax:.6,  wobble:1.4, autoRotY:.004,type:'drift'},
+  filed:     {speed:.15,sph:.85, aMin:.15,aMax:.35, wobble:.2,  autoRotY:.0005,type:'globe'},
+  ask:       {speed:.3, sph:.9,  aMin:.2, aMax:.4,  wobble:.3,  autoRotY:.001,type:'drift'}
+};
+
+function mkSprite(text,alpha){
+  var c=document.createElement('canvas'),cx=c.getContext('2d'),fs=28;
+  cx.font='normal '+fs+'px "Special Elite","Courier New",monospace';
+  var tw=cx.measureText(text).width;c.width=Math.ceil(tw)+20;c.height=fs+14;
+  cx.font='normal '+fs+'px "Special Elite","Courier New",monospace';
+  cx.fillStyle='#C0BDB8';cx.globalAlpha=alpha;cx.textBaseline='middle';
+  cx.fillText(text,10,c.height/2);
+  var tex=new THREE.CanvasTexture(c);tex.minFilter=THREE.LinearFilter;
+  var mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
+  var sp=new THREE.Sprite(mat);sp.scale.set(c.width*.36,c.height*.36,1);
+  return{sp:sp,mat:mat};
 }
 
-/* ── SCREENSAVER (desktop only) ── */
-var isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-if(!isMobile)(function(){
-  var done=false,running=false,idleTimer=null,timerStarted=false,IDLE=20000;
-  var HK=['0x4e554c4c','SIGSEGV','malloc(0)','free(NULL)','0xdeadbeef',
-    'root@zebralab:~#','sudo -i','chmod 000','rm -rf /','fork()','exec()',
-    '/proc/self/mem','[stack]','[heap]','ASLR disabled','NX bit','ROP chain',
-    'jmp 0x08048000','push eax','xor eax eax','int 0x80','CVE-2026-????',
-    'buffer overflow','heap spray','use-after-free','privilege escalation',
-    'lateral movement','persistence established','exfil complete','C2 beacon',
-    'payload deployed','keylogger active','found: 1 critical','found: 4 high',
-    'CVSS: 9.8','patch: NONE','signal','pattern','leverage','asymmetric','38ZebraLab'];
-  function hkw(){return HK[Math.floor(Math.random()*HK.length)];}
-  function hkline(){var n=6+Math.floor(Math.random()*8),a=[];for(var i=0;i<n;i++)a.push(hkw());return a.join('  ');}
-  function launch(){
-    if(done||running)return; running=true;
-    var ov=document.getElementById('ee-overlay'),hk=document.getElementById('ee-hacker'),lg=document.getElementById('ee-logo');
-    ov.classList.remove('yellow'); hk.style.opacity='1'; hk.textContent=''; lg.textContent=''; lg.style.opacity='1'; lg.style.transition='';
-    ov.classList.add('show');
-    var lc=Math.floor(window.innerHeight/20)+2,lines=[];
-    var hiv=setInterval(function(){lines.push(hkline());if(lines.length>lc)lines.shift();hk.textContent=lines.join('\n');},55);
-    setTimeout(function(){clearInterval(hiv);var fl=0,fiv=setInterval(function(){hk.style.opacity=fl%2===0?'0':'1';fl++;if(fl>=8){clearInterval(fiv);hk.style.opacity='0';}},70);},1800);
-    var LOGO='38ZebraLab';
-    setTimeout(function(){
-      lg.textContent=''; lg.style.cursor='pointer';
-      lg.onclick=function(){ov.classList.remove('show','yellow');ov.style.opacity='';done=true;running=false;showScreen('ask');};
-      LOGO.split('').forEach(function(ch,i){var sp=document.createElement('span');sp.className='ee-lchar';sp.textContent=ch;lg.appendChild(sp);setTimeout(function(){sp.classList.add('on');},i*100);});
-      var dot=document.createElement('span');dot.className='ee-lchar ee-dot';dot.textContent='.';lg.appendChild(dot);
-      setTimeout(function(){dot.classList.add('on');},LOGO.length*100);
-    },2300);
-    var logoEnd=2300+LOGO.length*100+400;
-    setTimeout(function(){
-      ov.classList.add('yellow');lg.style.transition='opacity 0.3s';lg.style.opacity='0';
-      setTimeout(function(){
-        lg.textContent='';lg.style.opacity='1';
-        var PH='you need us. you just realized.';
-        PH.split('').forEach(function(ch,i){var sp=document.createElement('span');sp.className='ee-lchar';sp.textContent=ch;lg.appendChild(sp);setTimeout(function(){sp.classList.add('on');},i*55);});
-        setTimeout(function(){ov.style.transition='opacity 0.9s';ov.style.opacity='0';setTimeout(function(){ov.classList.remove('show','yellow');ov.style.transition='';ov.style.opacity='';hk.style.opacity='1';done=true;running=false;},1000);},PH.length*55+900);
-      },400);
-    },logoEnd);
-  }
-  window._goStart=function(){if(done||timerStarted)return;timerStarted=true;idleTimer=setTimeout(launch,IDLE);};
-  window._goStop=function(){clearTimeout(idleTimer);timerStarted=false;};
-})();
+/* Create all particles once */
+var parts=[];
+for(var i=0;i<COUNT;i++){
+  var alpha=.35+Math.random()*.45;
+  var obj=mkSprite(rw(),alpha);
+  var phi=Math.acos(2*Math.random()-1),theta=Math.random()*Math.PI*2;
+  var r=SPHERE*(.4+Math.random()*.7);
+  var ox=r*Math.sin(phi)*Math.cos(theta),oy=r*Math.sin(phi)*Math.sin(theta),oz=r*Math.cos(phi);
+  obj.sp.position.set(ox,oy,oz);group.add(obj.sp);
+  var ex=Math.random()-.5,ey=Math.random()-.5,ez=Math.random()-.5;
+  var len=Math.sqrt(ex*ex+ey*ey+ez*ez)||1;
+  parts.push({sp:obj.sp,mat:obj.mat,phi:phi,theta:theta,r:r,
+    dT:(Math.random()-.5)*.0014,dP:(Math.random()-.5)*.0008,
+    wb:Math.random()*Math.PI*2,wbs:.0005+Math.random()*.0018,wba:3+Math.random()*12,
+    baseAlpha:alpha,ex:ex/len,ey:ey/len,ez:ez/len,
+    ox:ox,oy:oy,oz:oz,
+    dx:(Math.random()-.5)*.6,dy:(Math.random()-.5)*.3,dz:(Math.random()-.5)*.2});
+}
 
-/* ── CURSOR (desktop only) ── */
-if(!isMobile){
-  var _cur=document.querySelector('.cursor');
-  document.addEventListener('mousedown',function(){_cur&&_cur.classList.add('clicking');});
-  document.addEventListener('mouseup',function(){_cur&&_cur.classList.remove('clicking');});
-  document.addEventListener('mousemove',function(e){
-    document.documentElement.style.setProperty('--cx',e.clientX+'px');
-    document.documentElement.style.setProperty('--cy',e.clientY+'px');
+/* ═══ ANIMATION STATE ═══ */
+var mode='intro';
+var modeStart=performance.now(),introStart=performance.now();
+var introReady=false,hintShown=false,logoRevealed=false,subRevealed=false;
+var currentMood=MOOD.intro;
+
+/* 3 intro choreographies — random on each load */
+var CHOREO=[
+  /* A: Classic — chaos, globe orbit, implode, dissolve, explode, reform */
+  {chaos:3500,orbit:3000,implode:1600,hold:200,dissolve:600,pause:200,explode:900,reform:1300,fade:700,
+   seq:['intro','orbit','implode','dissolve','explode','reform','logo']},
+  /* B: Slow gather — long chaos, slow spiral tighten, quick snap to center, reform */
+  {chaos:4500,orbit:4000,implode:800,hold:100,dissolve:400,pause:100,explode:600,reform:1500,fade:700,
+   seq:['intro','orbit','implode','dissolve','explode','reform','logo']},
+  /* C: Quick burst — short chaos, no orbit, fast implode, big explode, slow reform */
+  {chaos:2000,orbit:0,implode:1000,hold:100,dissolve:500,pause:100,explode:1400,reform:2000,fade:700,
+   seq:['intro','implode','dissolve','explode','reform','logo']}
+];
+var choreo=CHOREO[Math.floor(Math.random()*CHOREO.length)];
+var T=choreo;
+var introSeq=choreo.seq;
+
+function ease3(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+function eOut3(t){return t===1?1:1-Math.pow(2,-10*t)}
+function lerp3(a,b,t){return a+(b-a)*t}
+
+var logoLetters=document.querySelectorAll('#intro-logo .il');
+
+function tick(){
+  requestAnimationFrame(tick);
+  var now=performance.now(),dt=now-modeStart;
+
+  /* ═══ INTRO SEQUENCE — choreography-driven ═══ */
+  if(mode==='intro'&&(now-introStart)>T.chaos){
+    var nextMode=introSeq[1]||'implode';mode=nextMode;modeStart=now;
+  }else if(mode==='orbit'&&dt>T.orbit){
+    var oi=introSeq.indexOf('orbit');var nm=introSeq[oi+1]||'implode';mode=nm;modeStart=now;
+  }else if(mode==='implode'&&dt>T.implode+T.hold){mode='dissolve';modeStart=now;}
+  else if(mode==='dissolve'&&dt>T.dissolve+T.pause){mode='explode';modeStart=now;}
+  else if(mode==='explode'&&dt>T.explode){mode='reform';modeStart=now;}
+  else if(mode==='reform'&&dt>T.reform){mode='logo';modeStart=now;}
+  else if(mode==='logo'&&dt>T.fade+400){mode='idle';modeStart=now;introReady=true;document.getElementById('intro-hint').classList.add('show');}
+
+  dt=now-modeStart;
+
+  /* ═══ ROTATION ═══ */
+  if(mode==='orbit'){
+    group.rotation.y+=.006;
+    group.rotation.x+=(MY*.04-group.rotation.x)*.02;
+  }else if(mode==='swarm'){
+    group.rotation.y+=currentMood.autoRotY;
+    group.rotation.y+=(MX*.1-group.rotation.y)*.02;
+    group.rotation.x+=(MY*.06-group.rotation.x)*.02;
+  }else{
+    group.rotation.y+=(MX*.16-group.rotation.y)*.04;
+    group.rotation.x+=(MY*.09-group.rotation.x)*.04;
+  }
+
+  /* ═══ PARTICLES ═══ */
+  for(var j=0;j<parts.length;j++){
+    var p=parts[j],s=p.sp,m=p.mat;
+
+    if(mode==='intro'){
+      p.theta+=p.dT;p.phi+=p.dP;p.wb+=p.wbs;
+      var wx=Math.sin(p.wb)*p.wba,wy=Math.cos(p.wb*1.3)*p.wba*.7;
+      s.position.set(p.r*Math.sin(p.phi)*Math.cos(p.theta)+wx,p.r*Math.sin(p.phi)*Math.sin(p.theta)+wy,p.r*Math.cos(p.phi));
+      m.opacity=p.baseAlpha;p.ox=s.position.x;p.oy=s.position.y;p.oz=s.position.z;
+
+    }else if(mode==='orbit'){
+      var ot=eOut3(Math.min(1,dt/1200));
+      var tR=SPHERE*.65;var cR=lerp3(p.r,tR,ot);
+      p.theta+=p.dT*.4;p.phi+=p.dP*.2;
+      s.position.set(cR*Math.sin(p.phi)*Math.cos(p.theta),cR*Math.sin(p.phi)*Math.sin(p.theta),cR*Math.cos(p.phi));
+      m.opacity=lerp3(p.baseAlpha,Math.min(p.baseAlpha*1.3,.85),ot*.5);
+      p.ox=s.position.x;p.oy=s.position.y;p.oz=s.position.z;
+
+    }else if(mode==='implode'){
+      var t1=ease3(Math.min(1,dt/T.implode));p.wb+=p.wbs;
+      s.position.set(lerp3(p.ox+Math.sin(p.wb)*p.wba*.1*(1-t1),0,t1),lerp3(p.oy+Math.cos(p.wb*1.3)*p.wba*.1*(1-t1),0,t1),lerp3(p.oz,0,t1));
+      m.opacity=lerp3(p.baseAlpha,.92,t1);
+
+    }else if(mode==='dissolve'){
+      var t2=Math.min(1,dt/T.dissolve);m.opacity=lerp3(.92,0,t2);s.position.set(0,0,0);
+
+    }else if(mode==='explode'){
+      var t3=eOut3(Math.min(1,dt/T.explode));var d=SPHERE*1.3*t3;
+      s.position.set(p.ex*d*(1.1+p.r/SPHERE),p.ey*d*(1.1+p.r/SPHERE),p.ez*d*.5);
+      m.opacity=lerp3(0,p.baseAlpha,t3);
+
+    }else if(mode==='reform'){
+      var t4=ease3(Math.min(1,dt/T.reform));m.opacity=lerp3(p.baseAlpha,0,t4);
+
+    }else if(mode==='logo'||mode==='idle'){
+      m.opacity=0;
+
+    }else if(mode==='swarm'){
+      if(currentMood.type==='drift'){
+        /* DRIFT — linear swarm flowing across screen */
+        p.wb+=p.wbs*currentMood.speed;
+        var dSpd=currentMood.speed*.35;
+        s.position.x+=p.dx*dSpd;
+        s.position.y+=p.dy*dSpd+Math.sin(p.wb)*p.wba*.03*currentMood.wobble;
+        s.position.z+=p.dz*dSpd*.5;
+        /* Wrap around edges */
+        var bound=SPHERE*currentMood.sph*1.2;
+        if(s.position.x>bound)s.position.x=-bound;
+        if(s.position.x<-bound)s.position.x=bound;
+        if(s.position.y>bound*.7)s.position.y=-bound*.7;
+        if(s.position.y<-bound*.7)s.position.y=bound*.7;
+        if(s.position.z>bound*.5)s.position.z=-bound*.5;
+        if(s.position.z<-bound*.5)s.position.z=bound*.5;
+      }else{
+        /* GLOBE — orbiting sphere */
+        p.theta+=p.dT*currentMood.speed;
+        p.phi+=p.dP*currentMood.speed;
+        p.wb+=p.wbs*currentMood.speed;
+        var sR=SPHERE*currentMood.sph;
+        p.r+=(sR*(.4+Math.random()*.01)-p.r)*.001;
+        var swx=Math.sin(p.wb)*p.wba*currentMood.wobble;
+        var swy=Math.cos(p.wb*1.3)*p.wba*.6*currentMood.wobble;
+        s.position.set(p.r*Math.sin(p.phi)*Math.cos(p.theta)+swx,p.r*Math.sin(p.phi)*Math.sin(p.theta)+swy,p.r*Math.cos(p.phi));
+      }
+      var tAlpha=currentMood.aMin+((p.baseAlpha-.35)/.45)*(currentMood.aMax-currentMood.aMin);
+      m.opacity+=(tAlpha-m.opacity)*.08;
+    }
+  }
+
+  /* ═══ LOGO LETTER REVEAL ═══ */
+  if(mode==='reform'||mode==='logo'||mode==='idle'){
+    var lt=mode==='reform'?eOut3(Math.min(1,dt/T.reform)):1;
+    if(!logoRevealed&&lt>.3){logoRevealed=true;logoLetters.forEach(function(l,i){setTimeout(function(){l.classList.add('show')},i*55)})}
+    if((mode==='logo'||mode==='idle')&&!subRevealed){subRevealed=true;document.getElementById('intro-sub').style.opacity='1'}
+  }
+
+  renderer.render(scene,camera);
+}
+tick();
+
+/* ═══ TRANSITION TO SWARM ═══ */
+function enterSwarm(key){
+  currentMood=MOOD[key]||MOOD.sections;
+  if(mode!=='swarm'){
+    /* Fade particles back in with new mood */
+    for(var j=0;j<parts.length;j++){
+      var p=parts[j];
+      var sR=SPHERE*currentMood.sph;
+      p.r=sR*(.15+Math.random()*1.0);
+      p.phi=Math.acos(2*Math.random()-1);
+      p.theta=Math.random()*Math.PI*2;
+      p.sp.position.set(p.r*Math.sin(p.phi)*Math.cos(p.theta),p.r*Math.sin(p.phi)*Math.sin(p.theta),p.r*Math.cos(p.phi));
+      p.mat.opacity=.08;
+    }
+  }
+  mode='swarm';modeStart=performance.now();
+}
+
+/* ═══ WORD REVEAL ═══ */
+function revealWords(id){
+  var inner=document.querySelector('#screen-'+id+' .content-inner');if(!inner)return;
+  inner.querySelectorAll('.entry-def,.entry-body,.who-bio').forEach(function(p){
+    if(p.dataset.rv)return;p.dataset.rv='1';
+    var txt=p.textContent,words=txt.split(/(\s+)/);p.innerHTML='';var idx=0;
+    words.forEach(function(w){if(/^\s+$/.test(w)){p.appendChild(document.createTextNode(w));return}
+      var span=document.createElement('span');span.className='reveal-word';span.textContent=w;
+      span.style.transitionDelay=(idx*22)+'ms';p.appendChild(span);idx++});
+    setTimeout(function(){p.querySelectorAll('.reveal-word').forEach(function(s){s.classList.add('show')})},400);
   });
 }
 
-/* ── NOISE POOL ── */
-var NP=[
-  'clause','nexus','leverage','equity','exposure','jurisdiction','arbitrage',
-  'carve-out','brief','ruling','motion','tenor','yield','spread','carry',
-  'delta','alpha','clearing','settlement','hedge','proxy','floor','ceiling',
-  'threshold','covenant','pledge','lien','warrant','disclosure','escrow',
-  'holdback','collateral','due diligence','indemnity','waiver','closing',
-  'signal','inference','prior','posterior','entropy','regime','velocity',
-  'momentum','trigger','outlier','anomaly','cluster','weight','vector',
-  'latency','corpus','pattern','edge','ratio','variance','drift','baseline',
-  'standing','appeal','record','filing','judgment','precedent','doctrine',
-  'counsel','court','verdict','opinion','dissent','injunction','sanction',
-  'deposition','subpoena','affidavit','statute','regulation','compliance',
-  'Miami','Milano','Manhattan','Zurich','London','Delaware','Luxembourg',
-  'Cayman','Basel','Geneva','Singapore','Dubai','Hong Kong','Nassau',
-  'Trump','Epstein','island','Maxwell','Ghislaine','Hillary','Clinton',
-  'oil','Iran','Maduro','Venezuela','BVI','offshore','indictment',
-  'classified','leaked','whistleblower','immunity','pardon','seizure',
-  'extradition','freeze','blacklist','redacted','declassified','sanction',
-  'tariffs','Fed','inflation','recession','bailout','impeachment',
-  'algorithm','model','inference','training','deployment','hallucination',
-  'token','embedding','latency','pipeline','vector','cluster','weight',
-  'benchmark','fine-tune','prompt','context','entropy','temperature'
-];
-function rw(){return NP[Math.floor(Math.random()*NP.length)];}
-function rws(n){var a=[];for(var i=0;i<n;i++)a.push(rw());return a;}
-function staticNoise(id,n){var el=document.getElementById(id);if(el)el.textContent=rws(n).join(' ');}
+/* ═══ PULSE FLASH ═══ */
+setTimeout(function(){
+  var dots=document.querySelectorAll('.tl-dot'),pulse=document.querySelector('.tl-pulse');
+  if(!pulse)return;
+  setInterval(function(){
+    if(current!=='sections')return;
+    var pr=pulse.getBoundingClientRect(),px=pr.left+pr.width/2;
+    dots.forEach(function(d){var dr=d.getBoundingClientRect(),dx=dr.left+dr.width/2;
+      if(Math.abs(px-dx)<18&&!d.classList.contains('flash')){d.classList.add('flash');setTimeout(function(){d.classList.remove('flash')},400)}});
+  },80);
+},500);
 
-function renderPlain(c,w){
-  c.innerHTML='';
-  for(var i=0;i<w.length;i++){var s=document.createElement('span');s.textContent=w[i]+' ';c.appendChild(s);}
+/* ═══ SCREEN MANAGER ═══ */
+var current='intro';
+function go(name){
+  if(name===current)return;
+  var next=document.getElementById('screen-'+name);if(!next)return;
+  document.getElementById('screen-'+current).classList.remove('active');
+  next.classList.add('active');current=name;
+  if(name==='intro'){mode='idle';for(var j=0;j<parts.length;j++)parts[j].mat.opacity=0;}
+  else{enterSwarm(name);}
+  setTimeout(function(){revealWords(name)},300);
+  applyHovers();
 }
-function renderLabels(c,w,p){
-  c.innerHTML='';
-  for(var i=0;i<w.length;i++){
-    var item=null;for(var j=0;j<p.length;j++){if(p[j].pos===i){item=p[j];break;}}
-    if(item){var s=document.createElement('span');s.className='n-label';s.textContent=item.text+' ';if(item.target){(function(t){s.addEventListener('click',function(){showScreen(t);});})(item.target);}c.appendChild(s);}
-    else{var s2=document.createElement('span');s2.textContent=w[i]+' ';c.appendChild(s2);}
+
+/* ═══ EVENTS ═══ */
+document.addEventListener('click',function(e){
+  if(current==='intro'&&introReady&&document.getElementById('screen-intro').contains(e.target)){
+    document.getElementById('intro-hint').classList.remove('show');
+    setTimeout(function(){go('sections')},120);return;
   }
-}
-function renderLogo(c,w,pos){
-  c.innerHTML='';
-  for(var i=0;i<w.length;i++){
-    if(i===pos){var wrap=document.createElement('span');wrap.className='n-logo';wrap.addEventListener('click',function(){showScreen('sections');});wrap.appendChild(document.createTextNode('38ZebraLab'));var yd=document.createElement('span');yd.className='logo-dot-yellow';yd.textContent='.';wrap.appendChild(yd);wrap.appendChild(document.createTextNode(' '));c.appendChild(wrap);}
-    else{var s=document.createElement('span');s.textContent=w[i]+' ';c.appendChild(s);}
-  }
-}
-function placeLabels(w,items){
-  var taken=[],placed=[];
-  for(var i=0;i<items.length;i++){var pos,tries=0;do{pos=20+Math.floor(Math.random()*(w.length-40));tries++;}while(tooClose(taken,pos,15)&&tries<80);taken.push(pos);placed.push({text:items[i].text,target:items[i].target,pos:pos});}
-  return placed;
-}
-function tooClose(arr,pos,d){for(var i=0;i<arr.length;i++)if(Math.abs(arr[i]-pos)<d)return true;return false;}
-
-/* ── SCREEN MANAGER ── */
-var current='intro', sectionsRunning=false, whatRunning=false;
-
-function showScreen(name){
-  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  document.getElementById('screen-'+name).classList.add('active');
-  current=name;
-  updateNav(name);
-  if(name==='who'){staticNoise('who-noise-top',28);staticNoise('who-noise-mid',22);}
-  if(name==='why'){staticNoise('why-noise-top',28);staticNoise('why-noise-mid',18);}
-  if(name==='where'){staticNoise('where-noise-top',28);staticNoise('where-noise-mid',18);}
-  if(name==='patterns'){staticNoise('enc-noise-patterns',20);staticNoise('enc-noise-patterns-bot',16);}
-  if(name==='legalintel'){staticNoise('enc-noise-legalintel',20);staticNoise('enc-noise-legalintel-bot',16);}
-  if(name==='cookingdata'){staticNoise('enc-noise-cookingdata',20);staticNoise('enc-noise-cookingdata-bot',16);}
-  if(name==='obvious'){staticNoise('enc-noise-obvious',20);staticNoise('enc-noise-obvious-bot',16);}
-  if(name==='ask') startAsk();
-  if(name==='sections'&&!sectionsRunning){sectionsRunning=true;runSections();}
-  if(name==='what'&&!whatRunning){whatRunning=true;runWhat();}
-  if(name==='sections'&&window._goStart) window._goStart();
-  if(name==='intro'){if(window._goStop)window._goStop();sectionsRunning=false;whatRunning=false;introClickEnabled=false;introLoop();}
-}
-
-/* ── INTRO ── */
-var introClickEnabled=false;
-document.getElementById('screen-intro').addEventListener('click',function(){
-  if(introClickEnabled&&current==='intro') showScreen('sections');
+  var btn=e.target.closest('[data-go]');if(btn)go(btn.getAttribute('data-go'));
 });
-document.getElementById('screen-intro').addEventListener('touchend',function(e){
-  e.preventDefault();
-  if(introClickEnabled&&current==='intro') showScreen('sections');
-},{passive:false});
-
-function getMottoIdx(){try{return parseInt(localStorage.getItem('zlb_motto')||'0',10)||0;}catch(e){return 0;}}
-function saveMottoIdx(n){try{localStorage.setItem('zlb_motto',String(n));}catch(e){}}
-var MOTTOS=[
-  'Raw data. We cook it.',
-  'Before it\'s obvious — that\'s the only moment we work in.',
-  'You ask the question. The tool is already built.',
-  'The signal is already there. Most people call it noise.',
-  'The pattern was always there. You just needed the right distance.',
-  'Milano to Miami is not a commute. It is a method.',
-  'The gap between disciplines is where the real work lives.',
-  'Precision is not caution. It is the opposite.',
-  'The answer was in the data. The question was the hard part.',
-  'We work with few. The right ones know why.',
-  'Most advantages expire. The ones built on judgment don\'t.',
-  'The best move in the room is the one no one expected you to know.'
-];
-function introLoop(){
-  var block=document.getElementById('intro-noise');
-  var words=rws(340);
-  var h1=setInterval(function(){if(current!=='intro'){clearInterval(h1);return;}words=words.slice(12).concat(rws(12));renderPlain(block,words);},120);
-  setTimeout(function(){
-    clearInterval(h1);if(current!=='intro')return;
-    var idx=getMottoIdx(),motto=MOTTOS[idx%MOTTOS.length];saveMottoIdx((idx+1)%MOTTOS.length);
-    var mw=motto.split(' ');
-    var _zk='zlb_zone',_zi=0;
-    try{_zi=(parseInt(sessionStorage.getItem(_zk)||'0',10)+1)%3;sessionStorage.setItem(_zk,String(_zi));}catch(e){}
-    var zr=[[0.05,0.28],[0.36,0.64],[0.72,0.92]][_zi];
-    var ss=Math.floor(words.length*zr[0]),se=Math.floor(words.length*zr[1])-mw.length;
-    if(se<=ss)se=ss+1;
-    var pos=ss+Math.floor(Math.random()*(se-ss)),disp=words.slice(),bold={};
-    for(var i=0;i<mw.length;i++){var p=pos+i;if(p<disp.length){disp[p]=mw[i];bold[p]=true;}}
-    block.innerHTML='';
-    for(var i=0;i<disp.length;i++){var s=document.createElement('span');s.textContent=disp[i]+' ';if(bold[i])s.className='n-hi';block.appendChild(s);}
-    introClickEnabled=true;
-    setTimeout(function(){
-      if(current!=='intro')return;
-      var h2=setInterval(function(){if(current!=='intro'){clearInterval(h2);return;}words=words.slice(12).concat(rws(12));renderPlain(block,words);},120);
-      setTimeout(function(){
-        clearInterval(h2);if(current!=='intro')return;
-        var lzr=[[0.05,0.28],[0.36,0.64],[0.72,0.92]][_zi];
-        var ls=Math.floor(words.length*lzr[0]),le=Math.floor(words.length*lzr[1])-2;
-        if(le<=ls)le=ls+1;
-        renderLogo(block,words,ls+Math.floor(Math.random()*(le-ls)));
-      },2800);
-    },2800);
-  },3600);
-}
-
-/* ── SECTIONS ── */
-var SECT_ITEMS=[
-  {text:'Who',target:'who'},{text:'What',target:'what'},{text:'Why',target:'why'},
-  {text:'Where',target:'where'},{text:'Ask',target:'ask'},
-  {text:'Milano',target:'ask'},{text:'Miami',target:'ask'},{text:'New York',target:'ask'}
-];
-function runSections(){
-  var col=document.getElementById('sections-col');col.innerHTML='';
-  var block=document.createElement('div');block.className='noise-block';col.appendChild(block);
-  var N=700,words=rws(N);
-  function mkSpan(word,isLabel,target){
-    var s=document.createElement('span');
-    if(isLabel){s.className='n-label';s.textContent=word+' ';s.addEventListener('click',(function(t){return function(){showScreen(t);};})(target));}
-    else{s.textContent=(word||rw())+' ';}
-    return s;
-  }
-  function renderNoise(w){block.innerHTML='';w.forEach(function(word){block.appendChild(mkSpan(word,false,null));});}
-  function renderWithLabels(w){block.innerHTML='';w.forEach(function(word){if(word&&word.indexOf('|LBL|')===0){var p=word.slice(5).split('|');block.appendChild(mkSpan(p[0],true,p[1]));}else{block.appendChild(mkSpan(word,false,null));}});}
-  function injectLabels(w){var out=w.slice(),vN=Math.min(280,Math.floor(out.length*0.4)),slot=Math.floor(vN/SECT_ITEMS.length);if(slot<1)slot=1;SECT_ITEMS.forEach(function(item,i){var pos=i*slot+Math.floor(Math.random()*Math.max(1,slot-1));if(pos>=out.length)pos=out.length-1;out[pos]='|LBL|'+item.text+'|'+item.target;});return out;}
-  function stripLabels(w){return w.map(function(word){return(word&&word.indexOf('|LBL|')===0)?rw():word;});}
-  var scrollY=0,SCROLL_SPEED=0.6,rafId=null,frozen=false;
-  function startScroll(){if(rafId)cancelAnimationFrame(rafId);frozen=false;function step(){if(current!=='sections'||frozen){rafId=null;return;}scrollY+=SCROLL_SPEED;var bH=block.offsetHeight;if(scrollY>bH/2){scrollY=0;words=words.slice(Math.floor(N/2)).concat(rws(Math.floor(N/2)));if(!frozen)renderNoise(words);}block.style.transform='translateY(-'+scrollY+'px)';rafId=requestAnimationFrame(step);}rafId=requestAnimationFrame(step);}
-  function stopScroll(){frozen=true;if(rafId){cancelAnimationFrame(rafId);rafId=null;}}
-  function freezeWithLabels(){stopScroll();scrollY=0;block.style.transform='translateY(0)';words=injectLabels(words);renderWithLabels(words);}
-  renderNoise(words);startScroll();
-  setTimeout(function(){if(current!=='sections'){sectionsRunning=false;return;}freezeWithLabels();setTimeout(function(){if(current!=='sections'){sectionsRunning=false;return;}words=stripLabels(words);renderNoise(words);block.style.transform='translateY(-'+scrollY+'px)';startScroll();setTimeout(function(){if(current!=='sections'){sectionsRunning=false;return;}freezeWithLabels();},2800);},1200);},3000);
-}
-
-/* ── WHAT ── */
-var WHAT_ITEMS=[
-  {text:'Patterns',target:'patterns'},{text:'Legal Intelligence',target:'legalintel'},
-  {text:'Cooking Data',target:'cookingdata'},{text:"Before it's obvious",target:'obvious'}
-];
-function runWhat(){
-  var block=document.getElementById('what-noise'),words=rws(340);
-  renderPlain(block,words);
-  var h1=setInterval(function(){if(current!=='what'){clearInterval(h1);whatRunning=false;return;}words=words.slice(12).concat(rws(12));renderPlain(block,words);},120);
-  setTimeout(function(){clearInterval(h1);if(current!=='what'){whatRunning=false;return;}renderLabels(block,words,placeLabels(words,WHAT_ITEMS));setTimeout(function(){if(current!=='what'){whatRunning=false;return;}var h2=setInterval(function(){if(current!=='what'){clearInterval(h2);whatRunning=false;return;}words=words.slice(12).concat(rws(12));renderPlain(block,words);},120);setTimeout(function(){clearInterval(h2);if(current!=='what'){whatRunning=false;return;}renderLabels(block,words,placeLabels(words,WHAT_ITEMS));},2600);},2400);},3400);
-}
-
-/* ── ASK ── */
-function startAsk(){
-  var heading=document.getElementById('ask-heading'),form=document.getElementById('ask-form');
-  form.classList.remove('show');heading.classList.remove('blinking');void heading.offsetWidth;
-  heading.classList.add('blinking');setTimeout(function(){form.classList.add('show');},2700);
-}
+document.getElementById('screen-intro').addEventListener('keydown',function(e){
+  if((e.key==='Enter'||e.key===' ')&&introReady){e.preventDefault();document.getElementById('intro-hint').classList.remove('show');setTimeout(function(){go('sections')},120)}
+});
 document.getElementById('ask-send-btn').addEventListener('click',function(){
   var email=document.getElementById('ask-email').value.trim();if(!email)return;
   window.location.href='mailto:g@38zebralab.ai?subject=38ZebraLab%20%E2%80%94%20Ask&body='+encodeURIComponent('From: '+email+'\n\n');
-  var conf=document.getElementById('ask-confirm');conf.style.opacity='1';
-  document.getElementById('ask-email').value='';
-  setTimeout(function(){conf.style.opacity='0';},3000);
+  var c=document.getElementById('ask-confirm');c.textContent='message sent.';c.style.opacity='1';
+  document.getElementById('ask-email').value='';setTimeout(function(){c.style.opacity='0'},3000);
 });
 
-/* ── BLUES BROTHERS ── */
-(function(){
-  var clicks=0,timer=null,triggered=false;
-  function runBB(){
-    if(triggered)return;triggered=true;
-    var ov=document.getElementById('bb-overlay'),txt=document.getElementById('bb-text');
-    ov.classList.add('show');setTimeout(function(){ov.classList.add('lit');},80);
-    var PH="We're putting the band back together.";
-    setTimeout(function(){txt.textContent='';PH.split('').forEach(function(ch,i){var sp=document.createElement('span');sp.className='bb-char';sp.textContent=ch;txt.appendChild(sp);setTimeout(function(){sp.classList.add('on');},i*55);});ov.classList.add('textshow');},1400);
-    setTimeout(function(){ov.style.transition='opacity 1.2s';ov.style.opacity='0';setTimeout(function(){ov.classList.remove('show','lit','textshow');ov.style.transition='';ov.style.opacity='';txt.textContent='';setTimeout(function(){triggered=false;},30000);},1300);},1400+PH.length*55+2200);
-  }
-  document.addEventListener('click',function(e){
-    if(!e.target.classList.contains('logo-dot-yellow')&&!e.target.closest('.logo-dot-yellow'))return;
-    clicks++;clearTimeout(timer);
-    if(clicks>=3){clicks=0;runBB();}else{timer=setTimeout(function(){clicks=0;},800);}
-  });
-})();
-
-/* ── BOOT ── */
-updateNav('intro');
-introLoop();
+/* ═══ SAFETY ═══ */
+setTimeout(function(){if(!introReady){introReady=true;document.getElementById('intro-hint').classList.add('show')}},12000);
+setTimeout(function(){if(current==='intro')go('sections')},18000);
+window.addEventListener('resize',function(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 
 })();
 </script>
