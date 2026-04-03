@@ -402,6 +402,7 @@ button { font-family:inherit; cursor:pointer; }
 <!-- MANIFESTO -->
 <section class="screen" id="screen-manifesto" aria-label="Manifesto">
   <div class="s-label">01 — Manifesto</div>
+  <h2 class="s-head" style="margin-bottom:1.4rem;">Everything<br>changed.</h2>
   <div class="manifesto-list">
     <div class="manifesto-item"><span class="manifesto-num">I</span><span>The world didn't start changing. It already changed. <strong>Most people are still optimizing for what used to be true.</strong></span></div>
     <div class="manifesto-item"><span class="manifesto-num">II</span><span>Everyone is using AI to go faster in the direction they were already going. That's not transformation. <strong>That's acceleration toward the wrong answer.</strong></span></div>
@@ -825,10 +826,10 @@ button { font-family:inherit; cursor:pointer; }
     const isBold = p.h === 1 || isDNA;
 
     // Alpha: same curve for heroes and noise.
-    // Dark bg (bgTv≈0): words light and slightly more visible.
-    // Light bg (bgTv≈1): words dark and more subtle.
-    const minA = 0.07  - bgTv * 0.02;  // dark: .07,  light: .05
-    const maxA = 0.38  - bgTv * 0.20;  // dark: .38,  light: .18
+    // Dark bg (bgTv≈0): words light, visible as hero.
+    // Light bg (bgTv≈1): words dark, clearly readable as texture.
+    const minA = 0.10  - bgTv * 0.02;  // dark: .10,  light: .08
+    const maxA = 0.42  - bgTv * 0.12;  // dark: .42,  light: .30
     const baseA = minA + depth * (maxA - minA);
 
     // Word color: lerp (247,246,243) → (26,26,26) as bgTv 0→1
@@ -963,6 +964,26 @@ button { font-family:inherit; cursor:pointer; }
 
     // Update right vectors for 3D text rotation
     updateRightVecs();
+
+    /* ── Mouse repulsion (all modes) ────────────────────────────
+       Convert mouse screen coords → approximate 3D world coords at z=0,
+       then push particles away if close. Creates satisfying interaction.  */
+    {
+      const S0 = (3.0 / 5.5) * Math.min(W, H) * 0.36; // scale at z=0
+      const mx3 =  (mouseX - W / 2) / S0;
+      const my3 = -(mouseY - H / 2) / S0;
+      const RAD = 1.0, STRENGTH = 0.022;
+      for (let i = 0; i < N; i++) {
+        const dx = px[i] - mx3;
+        const dy = py[i] - my3;
+        const dist = Math.hypot(dx, dy) || 0.001;
+        if (dist < RAD) {
+          const force = (RAD - dist) / RAD * STRENGTH;
+          px[i] += (dx / dist) * force;
+          py[i] += (dy / dist) * force;
+        }
+      }
+    }
 
     /* DNA rungs */
     if (mode === 'dna') {
